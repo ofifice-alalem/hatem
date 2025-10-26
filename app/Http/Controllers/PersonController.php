@@ -20,9 +20,9 @@ class PersonController extends Controller
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('national_no', 'like', "%{$search}%")
+                  ->orWhere('national_no', $search)
                   ->orWhereHas('militaryInfo', function($mq) use ($search) {
-                      $mq->where('military_no', 'like', "%{$search}%");
+                      $mq->where('military_no', $search);
                   });
             });
         }
