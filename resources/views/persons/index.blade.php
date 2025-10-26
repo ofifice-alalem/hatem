@@ -21,7 +21,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">إجمالي الأشخاص</p>
-                            <p class="text-3xl font-bold text-gray-900">{{ $persons->count() }}</p>
+                            <p class="text-3xl font-bold text-gray-900">{{ $persons->total() }}</p>
                             <p class="text-xs text-dark-blue-600 mt-1">↗ نشط</p>
                         </div>
                         <div class="w-12 h-12 bg-dark-blue-100 rounded-lg flex items-center justify-center">
@@ -36,7 +36,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">الضباط</p>
-                            <p class="text-3xl font-bold text-gray-900">{{ $persons->where('type.type_name', 'ضابط')->count() }}</p>
+                            <p class="text-3xl font-bold text-gray-900">{{ \App\Models\Person::whereHas('type', function($q) { $q->where('type_name', 'ضابط'); })->count() }}</p>
                             <p class="text-xs text-dark-blue-600 mt-1">ضابط</p>
                         </div>
                         <div class="w-12 h-12 bg-dark-blue-200 rounded-lg flex items-center justify-center">
@@ -51,7 +51,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">ضباط الصف</p>
-                            <p class="text-3xl font-bold text-gray-900">{{ $persons->where('type.type_name', 'ضابط صف')->count() }}</p>
+                            <p class="text-3xl font-bold text-gray-900">{{ \App\Models\Person::whereHas('type', function($q) { $q->where('type_name', 'ضابط صف'); })->count() }}</p>
                             <p class="text-xs text-yellow-600 mt-1">ضابط صف</p>
                         </div>
                         <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
@@ -66,7 +66,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">الموظفون</p>
-                            <p class="text-3xl font-bold text-gray-900">{{ $persons->where('type.type_name', 'موظف')->count() }}</p>
+                            <p class="text-3xl font-bold text-gray-900">{{ \App\Models\Person::whereHas('type', function($q) { $q->where('type_name', 'موظف'); })->count() }}</p>
                             <p class="text-xs text-purple-600 mt-1">موظف</p>
                         </div>
                         <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -78,14 +78,101 @@
                 </div>
             </div>
 
+            <!-- Filter Form -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-6">
+                <div class="px-6 py-4 border-b border-gray-100">
+                    <h3 class="text-lg font-semibold text-gray-900">فلترة البحث</h3>
+                </div>
+                <form method="GET" action="{{ route('persons.index') }}" class="p-6">
+                    <div class="flex flex-wrap gap-4">
+                        <!-- حقل البحث -->
+                        <div class="flex-1 min-w-80">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">بحث بالاسم أو الرقم</label>
+                            <input type="text" name="search" value="{{ request('search') }}" 
+                                   placeholder="الاسم أو الرقم الوطني أو العسكري"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        
+                        <!-- فلتر الصفة -->
+                        <div class="flex-1 min-w-40">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">الصفة</label>
+                            <div class="relative">
+                                <select name="type_id" id="typeFilter" 
+                                        class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary appearance-none">
+                                    <option value="">جميع الصفات</option>
+                                    @foreach($types as $type)
+                                        <option value="{{ $type->id }}" {{ request('type_id') == $type->id ? 'selected' : '' }}>
+                                            {{ $type->type_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- فلتر الرتبة -->
+                        <div class="flex-1 min-w-40">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">الرتبة</label>
+                            <div class="relative">
+                                <select name="rank_id" id="rankFilter" 
+                                        class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary appearance-none">
+                                    <option value="">جميع الرتب</option>
+                                    @foreach($ranks as $rank)
+                                        <option value="{{ $rank->id }}" 
+                                                data-type="{{ $rank->type_id }}"
+                                                {{ request('rank_id') == $rank->id ? 'selected' : '' }}
+                                                style="{{ request('type_id') && request('type_id') != $rank->type_id ? 'display:none' : '' }}">
+                                            {{ $rank->rank_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- الأزرار -->
+                        <div class="flex items-end gap-3">
+                            <button type="submit" 
+                                    class="px-6 py-2 bg-primary hover:bg-dark-blue-800 text-white font-medium rounded-lg transition duration-300 flex items-center whitespace-nowrap">
+                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                بحث
+                            </button>
+                            <a href="{{ route('persons.index') }}" 
+                               class="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition duration-300 flex items-center whitespace-nowrap h-10">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
             <!-- Data Table -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100">
                 <div class="px-6 py-4 border-b border-gray-100">
-                    <h2 class="text-lg font-semibold text-gray-900">قائمة الأشخاص</h2>
-                    <p class="text-sm text-gray-600 mt-1">إدارة ومتابعة بيانات جميع الأشخاص المسجلين</p>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-900">قائمة الأشخاص</h2>
+                            <p class="text-sm text-gray-600 mt-1">إدارة ومتابعة بيانات جميع الأشخاص المسجلين</p>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <span class="font-medium text-gray-900">{{ $persons->total() }}</span> شخص
+                        </div>
+                    </div>
                 </div>
                 
-                @if($persons->count() > 0)
+                @if($persons->total() > 0)
                     <div class="overflow-x-auto">
                         <table class="min-w-full">
                             <thead class="bg-gray-50">
@@ -148,6 +235,67 @@
                             </tbody>
                         </table>
                     </div>
+                    
+                    <!-- Pagination -->
+                    @if($persons->hasPages())
+                        <div class="px-6 py-4 border-t border-gray-100">
+                            <div class="flex items-center justify-between">
+                                <div class="text-sm text-gray-700">
+                                    عرض {{ $persons->firstItem() }} إلى {{ $persons->lastItem() }} من أصل {{ $persons->total() }} نتيجة
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    {{-- First Page --}}
+                                    @if($persons->currentPage() > 1)
+                                        <a href="{{ $persons->url(1) }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                            الأولى
+                                        </a>
+                                    @endif
+                                    
+                                    {{-- Previous Page --}}
+                                    @if($persons->onFirstPage())
+                                        <span class="px-3 py-2 text-sm font-medium text-gray-300 bg-white border border-gray-300 rounded-md cursor-not-allowed">
+                                            السابق
+                                        </span>
+                                    @else
+                                        <a href="{{ $persons->previousPageUrl() }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                            السابق
+                                        </a>
+                                    @endif
+                                    
+                                    {{-- Page Numbers --}}
+                                    @foreach($persons->getUrlRange(max(1, $persons->currentPage() - 2), min($persons->lastPage(), $persons->currentPage() + 2)) as $page => $url)
+                                        @if($page == $persons->currentPage())
+                                            <span class="px-3 py-2 text-sm font-medium text-white bg-primary border border-primary rounded-md">
+                                                {{ $page }}
+                                            </span>
+                                        @else
+                                            <a href="{{ $url }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                                {{ $page }}
+                                            </a>
+                                        @endif
+                                    @endforeach
+                                    
+                                    {{-- Next Page --}}
+                                    @if($persons->hasMorePages())
+                                        <a href="{{ $persons->nextPageUrl() }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                            التالي
+                                        </a>
+                                    @else
+                                        <span class="px-3 py-2 text-sm font-medium text-gray-300 bg-white border border-gray-300 rounded-md cursor-not-allowed">
+                                            التالي
+                                        </span>
+                                    @endif
+                                    
+                                    {{-- Last Page --}}
+                                    @if($persons->currentPage() < $persons->lastPage())
+                                        <a href="{{ $persons->url($persons->lastPage()) }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                            الأخيرة
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 @else
                     <div class="text-center py-16">
                         <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -212,6 +360,23 @@
     </form>
 
     <script>
+        // تحديث قائمة الرتب عند تغيير الصفة
+        document.getElementById('typeFilter').addEventListener('change', function() {
+            const selectedType = this.value;
+            const rankOptions = document.querySelectorAll('#rankFilter option[data-type]');
+            
+            // إعادة تعيين اختيار الرتبة
+            document.getElementById('rankFilter').value = '';
+            
+            rankOptions.forEach(option => {
+                if (selectedType === '' || option.dataset.type === selectedType) {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+        });
+        
         let currentPersonId = null;
         
         function openDeleteModal(personId, personName) {

@@ -11,10 +11,37 @@ use Illuminate\Http\Request;
 
 class PersonController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $persons = Person::with(['type', 'rank', 'militaryInfo'])->get();
-        return view('persons.index', compact('persons'));
+        $query = Person::with(['type', 'rank', 'militaryInfo']);
+        
+        // فلتر البحث النصي
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('national_no', 'like', "%{$search}%")
+                  ->orWhereHas('militaryInfo', function($mq) use ($search) {
+                      $mq->where('military_no', 'like', "%{$search}%");
+                  });
+            });
+        }
+        
+        // فلتر الصفة
+        if ($request->filled('type_id')) {
+            $query->where('type_id', $request->type_id);
+        }
+        
+        // فلتر الرتبة
+        if ($request->filled('rank_id')) {
+            $query->where('rank_id', $request->rank_id);
+        }
+        
+        $persons = $query->paginate(50)->withQueryString();
+        $types = Type::all();
+        $ranks = Rank::all();
+        
+        return view('persons.index', compact('persons', 'types', 'ranks'));
     }
 
     public function create()
