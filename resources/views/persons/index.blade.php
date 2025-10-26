@@ -106,14 +106,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $person->system_no }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $person->file_no }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $person->national_no }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center ml-3">
-                                                    <span class="text-xs font-medium text-gray-600">{{ substr($person->name, 0, 1) }}</span>
-                                                </div>
-                                                <div class="text-sm font-medium text-gray-900">{{ $person->name }}</div>
-                                            </div>
-                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $person->name }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                                 @if($person->type->type_name == 'ضابط') bg-dark-blue-100 text-dark-blue-800
