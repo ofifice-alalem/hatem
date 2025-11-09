@@ -29,15 +29,31 @@
                     },
                     fontFamily: {
                         'sans': ['Tajawal', 'ui-sans-serif', 'system-ui']
+                    },
+                    boxShadow: {
+                        'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                        'md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                        'xl': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                        'card': '0 4px 12px rgba(18, 24, 217, 0.08)'
                     }
                 }
             }
         }
     </script>
+    <style>
+        * {
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+    </style>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {{ $head ?? '' }}
 </head>
-<body class="bg-gray-50 font-sans">
+<body class="font-sans">
     <div class="min-h-screen">
         <!-- Sidebar -->
         <x-sidebar />

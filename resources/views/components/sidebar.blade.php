@@ -1,14 +1,14 @@
 <!-- Sidebar -->
-<div class="fixed top-4 right-4 bottom-4 w-64 bg-white shadow-md rounded-2xl z-50">
+<div class="fixed top-4 right-4 bottom-4 w-64 bg-white shadow-card rounded-2xl z-50 border border-gray-100">
     <div class="p-6">
         <!-- Logo -->
         <div class="flex items-center mb-12">
-            <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center ml-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-primary to-dark-blue-800 rounded-xl flex items-center justify-center ml-3 shadow-md">
                 <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </div>
-            <span class="text-xl font-bold text-gray-900">نظام الإدارة</span>
+            <span class="text-xl font-bold bg-gradient-to-r from-primary to-dark-blue-800 bg-clip-text text-transparent">نظام الإدارة</span>
         </div>
         
         <!-- Menu Label -->
@@ -17,43 +17,33 @@
         <!-- Navigation -->
         <nav class="space-y-1">
             <!-- Dashboard -->
-            <a href="{{ route('persons.index') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('persons.index') ? 'relative' : 'hover:bg-gray-50 transition-colors' }}">
-                @if(request()->routeIs('persons.index'))
-                    <div class="absolute right-0 top-0 bottom-0 w-1 bg-primary rounded-l-lg"></div>
-                @endif
+            <a href="{{ route('persons.index') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ request()->routeIs('persons.index') ? 'bg-gradient-to-r from-primary/10 to-dark-blue-100 text-primary border-r-2 border-primary' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                 <div class="w-5 h-5 ml-3 {{ request()->routeIs('persons.index') ? 'text-primary' : 'text-gray-400 group-hover:text-gray-600' }}">
                     <svg fill="currentColor" viewBox="0 0 20 20">
                         <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
                     </svg>
                 </div>
-                <span class="{{ request()->routeIs('persons.index') ? 'text-gray-900' : 'text-gray-600 group-hover:text-gray-900' }}">لوحة التحكم</span>
+                <span>لوحة التحكم</span>
             </a>
             
             <!-- Pending Requests -->
-            <a href="{{ route('pending.index') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('pending.index') ? 'relative' : 'hover:bg-gray-50 transition-colors' }}">
-                @if(request()->routeIs('pending.index'))
-                    <div class="absolute right-0 top-0 bottom-0 w-1 bg-primary rounded-l-lg"></div>
-                @endif
+            <a href="{{ route('pending.index') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ request()->routeIs('pending.index') ? 'bg-gradient-to-r from-primary/10 to-dark-blue-100 text-primary border-r-2 border-primary' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                 <div class="w-5 h-5 ml-3 {{ request()->routeIs('pending.index') ? 'text-primary' : 'text-gray-400 group-hover:text-gray-600' }}">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
-                <span class="{{ request()->routeIs('pending.index') ? 'text-gray-900' : 'text-gray-600 group-hover:text-gray-900' }}">الطلبات المعلقة</span>
+                <span>الطلبات المعلقة</span>
             </a>
-            
+
             <!-- Add Person -->
-            <a href="{{ route('persons.create') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('persons.create') ? 'relative' : 'hover:bg-gray-50 transition-colors' }}">
-                @if(request()->routeIs('persons.create'))
-                    <div class="absolute right-0 top-0 bottom-0 w-1 bg-primary rounded-l-lg"></div>
-                @endif
+            <a href="{{ route('persons.create') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ request()->routeIs('persons.create') ? 'bg-gradient-to-r from-primary/10 to-dark-blue-100 text-primary border-r-2 border-primary' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                 <div class="w-5 h-5 ml-3 {{ request()->routeIs('persons.create') ? 'text-primary' : 'text-gray-400 group-hover:text-gray-600' }}">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                     </svg>
                 </div>
-                <span class="{{ request()->routeIs('persons.create') ? 'text-gray-900' : 'text-gray-600 group-hover:text-gray-900' }}">إضافة شخص</span>
-
+                <span>إضافة شخص</span>
             </a>
             
             <!-- Reports -->
