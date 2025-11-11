@@ -62,7 +62,8 @@
         }
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
+            height: 4px;
         }
         ::-webkit-scrollbar-track {
             background: rgba(255, 255, 255, 0.05);
@@ -75,6 +76,30 @@
         ::-webkit-scrollbar-thumb:hover {
             background: rgba(102, 126, 234, 0.7);
         }
+        /* Light Mode */
+        body.light-mode {
+            background: #f3f4f6 !important;
+        }
+        body.light-mode .glass-effect {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+        }
+        body.light-mode .text-white { color: #111827 !important; }
+        body.light-mode .text-gray-300 { color: #4b5563 !important; }
+        body.light-mode .text-gray-400 { color: #6b7280 !important; }
+        body.light-mode .bg-white\/5 { background: rgba(0, 0, 0, 0.05) !important; }
+        body.light-mode .bg-white\/10 { background: rgba(0, 0, 0, 0.1) !important; }
+        body.light-mode .border-white\/10 { border-color: rgba(0, 0, 0, 0.1) !important; }
+        body.light-mode .divide-white\/10 > * { border-color: rgba(0, 0, 0, 0.1) !important; }
+        body.light-mode #themeBtn { background: rgba(0, 0, 0, 0.1) !important; color: #111827 !important; }
+        body.light-mode #themeBtn:hover { background: rgba(0, 0, 0, 0.15) !important; }
+        body.light-mode #addBtn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; }
+        body.light-mode #deleteBtn { background: #dc2626 !important; }
+        body.light-mode select option { background: white !important; color: #111827 !important; }
+        body.light-mode .gradient-purple { color: white !important; }
+        body.light-mode .gradient-purple * { color: white !important; }
+        body.light-mode .hover\:bg-white\/10:hover { background: rgba(0, 0, 0, 0.05) !important; }
+        body.light-mode .hover\:bg-white\/5:hover { background: rgba(0, 0, 0, 0.03) !important; }
     </style>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {{ $head ?? '' }}
