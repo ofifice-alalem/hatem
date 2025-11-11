@@ -36,7 +36,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">الضباط</p>
-                            <p class="text-3xl font-bold text-gray-900">{{ \App\Models\Person::whereHas('type', function($q) { $q->where('type_name', 'ضابط'); })->count() }}</p>
+                            <p class="text-3xl font-bold text-gray-900">{{ \App\Models\Person::whereHas('rank.category', function($q) { $q->where('category_name', 'ضابط'); })->count() }}</p>
                             <p class="text-xs text-dark-blue-600 mt-1">ضابط</p>
                         </div>
                         <div class="w-12 h-12 bg-dark-blue-200 rounded-lg flex items-center justify-center">
@@ -51,7 +51,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">ضباط الصف</p>
-                            <p class="text-3xl font-bold text-gray-900">{{ \App\Models\Person::whereHas('type', function($q) { $q->where('type_name', 'ضابط صف'); })->count() }}</p>
+                            <p class="text-3xl font-bold text-gray-900">{{ \App\Models\Person::whereHas('rank.category', function($q) { $q->where('category_name', 'ضابط صف'); })->count() }}</p>
                             <p class="text-xs text-yellow-600 mt-1">ضابط صف</p>
                         </div>
                         <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
@@ -66,7 +66,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">الموظفون</p>
-                            <p class="text-3xl font-bold text-gray-900">{{ \App\Models\Person::whereHas('type', function($q) { $q->where('type_name', 'موظف'); })->count() }}</p>
+                            <p class="text-3xl font-bold text-gray-900">{{ \App\Models\Person::whereHas('rank.category', function($q) { $q->where('category_name', 'موظف'); })->count() }}</p>
                             <p class="text-xs text-purple-600 mt-1">موظف</p>
                         </div>
                         <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -93,16 +93,16 @@
                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                         </div>
                         
-                        <!-- فلتر الصفة -->
+                        <!-- فلتر الفئة -->
                         <div class="flex-1 min-w-40">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">الصفة</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">الفئة</label>
                             <div class="relative">
-                                <select name="type_id" id="typeFilter" 
+                                <select name="category_id" id="categoryFilter" 
                                         class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary appearance-none">
-                                    <option value="">جميع الصفات</option>
-                                    @foreach($types as $type)
-                                        <option value="{{ $type->id }}" {{ request('type_id') == $type->id ? 'selected' : '' }}>
-                                            {{ $type->type_name }}
+                                    <option value="">جميع الفئات</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->category_name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -120,13 +120,13 @@
                             <div class="relative">
                                 <select name="rank_id" id="rankFilter" 
                                         class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary appearance-none disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                        {{ !request('type_id') ? 'disabled' : '' }}>
-                                    <option value="">{{ !request('type_id') ? 'اختر الصفة أولاً' : 'جميع الرتب' }}</option>
+                                        {{ !request('category_id') ? 'disabled' : '' }}>
+                                    <option value="">{{ !request('category_id') ? 'اختر الفئة أولاً' : 'جميع الرتب' }}</option>
                                     @foreach($ranks as $rank)
                                         <option value="{{ $rank->id }}" 
-                                                data-type="{{ $rank->type_id }}"
+                                                data-category="{{ $rank->category_id }}"
                                                 {{ request('rank_id') == $rank->id ? 'selected' : '' }}
-                                                style="{{ request('type_id') && request('type_id') != $rank->type_id ? 'display:none' : '' }}">
+                                                style="{{ request('category_id') && request('category_id') != $rank->category_id ? 'display:none' : '' }}">
                                             {{ $rank->rank_name }}
                                         </option>
                                     @endforeach
@@ -178,11 +178,11 @@
                         <table class="min-w-full">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">رقم المنظومة</th>
+                                    <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">رقم المعرف</th>
                                     <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">رقم الملف</th>
                                     <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الرقم الوطني</th>
                                     <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الاسم</th>
-                                    <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الصفة</th>
+                                    <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الفئة</th>
                                     <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الرتبة</th>
                                     <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الرقم العسكري</th>
                                     <th class="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">الإجراءات</th>
@@ -191,17 +191,17 @@
                             <tbody class="bg-white divide-y divide-gray-100">
                                 @foreach($persons as $person)
                                     <tr class="hover:bg-gray-50 transition-colors">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $person->system_no }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $person->file_no }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{!! request('search') ? preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<span class="bg-yellow-200 px-1 rounded">$1</span>', $person->national_no) : $person->national_no !!}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $person->id }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $person->file_number }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{!! request('search') ? preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<span class="bg-yellow-200 px-1 rounded">$1</span>', $person->national_id) : $person->national_id !!}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{!! request('search') ? preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<span class="bg-yellow-200 px-1 rounded">$1</span>', $person->name) : $person->name !!}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                @if($person->type->type_name == 'ضابط') bg-dark-blue-100 text-dark-blue-800
-                                                @elseif($person->type->type_name == 'ضابط صف') bg-dark-blue-200 text-dark-blue-900
+                                                @if($person->rank->category->category_name == 'ضابط') bg-dark-blue-100 text-dark-blue-800
+                                                @elseif($person->rank->category->category_name == 'ضابط صف') bg-dark-blue-200 text-dark-blue-900
                                                 @else bg-purple-100 text-purple-800 @endif
-                                                @if(request('type_id') == $person->type_id) ring-2 ring-yellow-400 @endif">
-                                                {{ $person->type->type_name }}
+                                                @if(request('category_id') == $person->rank->category_id) ring-2 ring-yellow-400 @endif">
+                                                {{ $person->rank->category->category_name }}
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
@@ -212,22 +212,60 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                             @if($person->militaryInfo)
                                                 <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
-                                                    {!! request('search') ? preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<span class="bg-yellow-200 px-1 rounded">$1</span>', $person->militaryInfo->military_no) : $person->militaryInfo->military_no !!}
+                                                    {!! request('search') ? preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<span class="bg-yellow-200 px-1 rounded">$1</span>', $person->militaryInfo->military_number) : $person->militaryInfo->military_number !!}
                                                 </span>
                                             @else
                                                 <span class="text-gray-400">-</span>
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                                            <div class="flex justify-center space-x-2">
-                                                <a href="{{ route('persons.edit', $person->system_no) }}" 
+                                            <div class="flex justify-center space-x-1">
+                                                <a href="{{ route('persons.edit', $person->id) }}" 
                                                    class="inline-flex items-center p-2 text-dark-blue-600 hover:text-dark-blue-900 hover:bg-dark-blue-50 rounded-lg transition-all duration-200" 
-                                                   title="تعديل">
+                                                   title="تعديل البيانات الشخصية">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                                     </svg>
                                                 </a>
-                                                <button onclick="openDeleteModal('{{ $person->system_no }}', '{{ $person->name }}')" 
+                                                
+                                                @if($person->militaryInfo)
+                                                    <a href="{{ route('military-info.edit', $person->militaryInfo->id) }}" 
+                                                       class="inline-flex items-center p-2 text-green-600 hover:text-green-900 hover:bg-green-50 rounded-lg transition-all duration-200" 
+                                                       title="تعديل المعلومات العسكرية">
+                                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                                        </svg>
+                                                    </a>
+                                                @else
+                                                    <a href="{{ route('military-info.create', $person->national_id) }}" 
+                                                       class="inline-flex items-center p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-all duration-200" 
+                                                       title="إضافة معلومات عسكرية">
+                                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                                                        </svg>
+                                                    </a>
+                                                @endif
+                                                
+                                                @if($person->workInfo)
+                                                    <a href="{{ route('work-info.edit', $person->workInfo->id) }}" 
+                                                       class="inline-flex items-center p-2 text-purple-600 hover:text-purple-900 hover:bg-purple-50 rounded-lg transition-all duration-200" 
+                                                       title="تعديل معلومات العمل">
+                                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"/>
+                                                            <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z"/>
+                                                        </svg>
+                                                    </a>
+                                                @else
+                                                    <a href="{{ route('work-info.create', $person->national_id) }}" 
+                                                       class="inline-flex items-center p-2 text-orange-600 hover:text-orange-900 hover:bg-orange-50 rounded-lg transition-all duration-200" 
+                                                       title="إضافة معلومات عمل">
+                                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                                                        </svg>
+                                                    </a>
+                                                @endif
+                                                
+                                                <button onclick="openDeleteModal('{{ $person->id }}', '{{ $person->name }}')" 
                                                         class="inline-flex items-center p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-all duration-200" 
                                                         title="حذف">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -366,26 +404,26 @@
     </form>
 
     <script>
-        // تحديث قائمة الرتب عند تغيير الصفة
-        document.getElementById('typeFilter').addEventListener('change', function() {
-            const selectedType = this.value;
+        // تحديث قائمة الرتب عند تغيير الفئة
+        document.getElementById('categoryFilter').addEventListener('change', function() {
+            const selectedCategory = this.value;
             const rankFilter = document.getElementById('rankFilter');
-            const rankOptions = document.querySelectorAll('#rankFilter option[data-type]');
+            const rankOptions = document.querySelectorAll('#rankFilter option[data-category]');
             const firstOption = document.querySelector('#rankFilter option:first-child');
             
             // إعادة تعيين اختيار الرتبة
             rankFilter.value = '';
             
-            if (selectedType === '') {
+            if (selectedCategory === '') {
                 rankFilter.disabled = true;
-                firstOption.textContent = 'اختر الصفة أولاً';
+                firstOption.textContent = 'اختر الفئة أولاً';
             } else {
                 rankFilter.disabled = false;
                 firstOption.textContent = 'جميع الرتب';
             }
             
             rankOptions.forEach(option => {
-                if (selectedType === '' || option.dataset.type === selectedType) {
+                if (selectedCategory === '' || option.dataset.category === selectedCategory) {
                     option.style.display = 'block';
                 } else {
                     option.style.display = 'none';

@@ -3,19 +3,35 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\PendingRequestController;
+use App\Http\Controllers\MilitaryInfoController;
+use App\Http\Controllers\WorkInfoController;
+use App\Http\Controllers\LeaveController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/persons', [PersonController::class, 'index'])->name('persons.index');
-Route::get('/persons/create', [PersonController::class, 'create'])->name('persons.create');
-Route::post('/persons', [PersonController::class, 'store'])->name('persons.store');
-Route::get('/persons/{person}/edit', [PersonController::class, 'edit'])->name('persons.edit');
-Route::put('/persons/{person}', [PersonController::class, 'update'])->name('persons.update');
-Route::delete('/persons/{person}', [PersonController::class, 'destroy'])->name('persons.destroy');
-Route::get('/api/ranks/{typeId}', [PersonController::class, 'getRanksByType'])->name('ranks.by.type');
+// الأشخاص
+Route::resource('persons', PersonController::class);
+Route::get('/api/ranks/{categoryId}', [PersonController::class, 'getRanksByCategory'])->name('ranks.by.category');
 
+// المعلومات العسكرية
+Route::get('/military-info/create/{nationalId}', [MilitaryInfoController::class, 'create'])->name('military-info.create');
+Route::post('/military-info', [MilitaryInfoController::class, 'store'])->name('military-info.store');
+Route::get('/military-info/{id}/edit', [MilitaryInfoController::class, 'edit'])->name('military-info.edit');
+Route::put('/military-info/{id}', [MilitaryInfoController::class, 'update'])->name('military-info.update');
+
+// معلومات العمل
+Route::get('/work-info/create/{nationalId}', [WorkInfoController::class, 'create'])->name('work-info.create');
+Route::post('/work-info', [WorkInfoController::class, 'store'])->name('work-info.store');
+Route::get('/work-info/{id}/edit', [WorkInfoController::class, 'edit'])->name('work-info.edit');
+Route::put('/work-info/{id}', [WorkInfoController::class, 'update'])->name('work-info.update');
+
+// الإجازات
+Route::resource('leaves', LeaveController::class);
+Route::get('/leaves/create/{nationalId?}', [LeaveController::class, 'create'])->name('leaves.create.person');
+
+// الطلبات المعلقة
 Route::get('/pending', [PendingRequestController::class, 'index'])->name('pending.index');
 Route::post('/pending/{id}/approve', [PendingRequestController::class, 'approve'])->name('pending.approve');
 Route::post('/pending/{id}/reject', [PendingRequestController::class, 'reject'])->name('pending.reject');

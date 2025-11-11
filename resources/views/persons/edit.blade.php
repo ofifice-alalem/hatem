@@ -27,21 +27,28 @@
 
             <!-- Form Card -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-                <form action="{{ route('persons.update', $person->system_no) }}" method="POST" class="space-y-6">
+                <form action="{{ route('persons.update', $person->id) }}" method="POST" class="space-y-6">
                     @csrf
                     @method('PUT')
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">نوع الملف</label>
+                            <input type="text" name="file_type" value="{{ old('file_type', $person->file_type) }}" 
+                                   class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                                   placeholder="أدخل نوع الملف" required>
+                        </div>
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">رقم الملف</label>
-                            <input type="text" name="file_no" value="{{ old('file_no', $person->file_no) }}" 
+                            <input type="text" name="file_number" value="{{ old('file_number', $person->file_number) }}" 
                                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
                                    placeholder="أدخل رقم الملف" required>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">الرقم الوطني</label>
-                            <input type="text" name="national_no" value="{{ old('national_no', $person->national_no) }}" 
+                            <input type="text" name="national_id" value="{{ old('national_id', $person->national_id) }}" 
                                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
                                    placeholder="أدخل الرقم الوطني" required>
                         </div>
@@ -54,40 +61,61 @@
                                placeholder="أدخل الاسم الكامل" required>
                     </div>
 
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الرتبة</label>
+                        <select name="rank_id" id="rank_id" 
+                                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" required>
+                            <option value="">اختر الرتبة</option>
+                            @foreach($ranks as $rank)
+                                <option value="{{ $rank->id }}" {{ old('rank_id', $person->rank_id) == $rank->id ? 'selected' : '' }}>
+                                    {{ $rank->category->category_name }} - {{ $rank->rank_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">الصفة</label>
-                            <select name="type_id" id="type_id" 
-                                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" required>
-                                <option value="">اختر الصفة</option>
-                                @foreach($types as $type)
-                                    <option value="{{ $type->id }}" {{ old('type_id', $person->type_id) == $type->id ? 'selected' : '' }}>
-                                        {{ $type->type_name }}
-                                    </option>
-                                @endforeach
+                            <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ الميلاد</label>
+                            <input type="date" name="birth_date" value="{{ old('birth_date', $person->birth_date?->format('Y-m-d')) }}" 
+                                   class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">مكان الميلاد</label>
+                            <input type="text" name="birth_place" value="{{ old('birth_place', $person->birth_place) }}" 
+                                   class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                                   placeholder="أدخل مكان الميلاد">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">الجنس</label>
+                            <select name="gender" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                                <option value="">اختر الجنس</option>
+                                <option value="ذكر" {{ old('gender', $person->gender) == 'ذكر' ? 'selected' : '' }}>ذكر</option>
+                                <option value="أنثى" {{ old('gender', $person->gender) == 'أنثى' ? 'selected' : '' }}>أنثى</option>
                             </select>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">الرتبة</label>
-                            <select name="rank_id" id="rank_id" 
-                                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" required>
-                                <option value="">اختر الرتبة</option>
-                                @foreach($ranks as $rank)
-                                    <option value="{{ $rank->id }}" {{ old('rank_id', $person->rank_id) == $rank->id ? 'selected' : '' }}>
-                                        {{ $rank->rank_name }}
-                                    </option>
-                                @endforeach
+                            <label class="block text-sm font-medium text-gray-700 mb-2">فصيلة الدم</label>
+                            <select name="blood_type" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                                <option value="">اختر فصيلة الدم</option>
+                                <option value="A+" {{ old('blood_type', $person->blood_type) == 'A+' ? 'selected' : '' }}>A+</option>
+                                <option value="A-" {{ old('blood_type', $person->blood_type) == 'A-' ? 'selected' : '' }}>A-</option>
+                                <option value="B+" {{ old('blood_type', $person->blood_type) == 'B+' ? 'selected' : '' }}>B+</option>
+                                <option value="B-" {{ old('blood_type', $person->blood_type) == 'B-' ? 'selected' : '' }}>B-</option>
+                                <option value="AB+" {{ old('blood_type', $person->blood_type) == 'AB+' ? 'selected' : '' }}>AB+</option>
+                                <option value="AB-" {{ old('blood_type', $person->blood_type) == 'AB-' ? 'selected' : '' }}>AB-</option>
+                                <option value="O+" {{ old('blood_type', $person->blood_type) == 'O+' ? 'selected' : '' }}>O+</option>
+                                <option value="O-" {{ old('blood_type', $person->blood_type) == 'O-' ? 'selected' : '' }}>O-</option>
                             </select>
                         </div>
                     </div>
 
-                    <div id="military_no_field" class="{{ $person->type->type_name == 'ضابط صف' ? '' : 'hidden' }}">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">الرقم العسكري</label>
-                        <input type="text" name="military_no" value="{{ old('military_no', $person->militaryInfo?->military_no) }}" 
-                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
-                               placeholder="أدخل الرقم العسكري">
-                    </div>
+
 
                     <div class="flex justify-end gap-4 pt-6 border-t border-gray-100">
                         <a href="{{ route('persons.index') }}" 
@@ -104,44 +132,5 @@
                     </div>
                 </form>
             </div>
-    <x-slot name="scripts">
-        <script>
-        const typeSelect = document.getElementById('type_id');
-        const rankSelect = document.getElementById('rank_id');
-        const militaryField = document.getElementById('military_no_field');
-        const militaryInput = document.querySelector('input[name="military_no"]');
 
-        typeSelect.addEventListener('change', function() {
-            const typeId = this.value;
-            const selectedText = this.options[this.selectedIndex].text;
-            
-            // Show/hide military number field
-            if (selectedText === 'ضابط صف') {
-                militaryField.classList.remove('hidden');
-                militaryInput.required = true;
-            } else {
-                militaryField.classList.add('hidden');
-                militaryInput.required = false;
-                militaryInput.value = '';
-            }
-            
-            // Load ranks for selected type
-            if (typeId) {
-                fetch(`/api/ranks/${typeId}`)
-                    .then(response => response.json())
-                    .then(ranks => {
-                        const currentRankId = rankSelect.value;
-                        rankSelect.innerHTML = '<option value="">اختر الرتبة</option>';
-                        ranks.forEach(rank => {
-                            const option = document.createElement('option');
-                            option.value = rank.id;
-                            option.textContent = rank.rank_name;
-                            if (rank.id == currentRankId) option.selected = true;
-                            rankSelect.appendChild(option);
-                        });
-                    });
-            }
-        });
-        </script>
-    </x-slot>
 </x-layout>

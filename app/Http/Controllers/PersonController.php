@@ -2,34 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Type;
 use App\Models\Rank;
 use App\Models\Person;
+use App\Models\RankCategory;
 use App\Models\MilitaryInfo;
-use App\Models\PendingRequest;
+use App\Models\WorkInfo;
+use App\Models\EmploymentStatus;
 use Illuminate\Http\Request;
 
 class PersonController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Person::with(['type', 'rank', 'militaryInfo']);
+        $query = Person::with(['rank.category', 'militaryInfo', 'workInfo']);
         
         // فلتر البحث النصي
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('national_no', $search)
+                  ->orWhere('national_id', $search)
                   ->orWhereHas('militaryInfo', function($mq) use ($search) {
-                      $mq->where('military_no', $search);
+                      $mq->where('military_number', $search);
                   });
             });
         }
         
-        // فلتر الصفة
-        if ($request->filled('type_id')) {
-            $query->where('type_id', $request->type_id);
+        // فلتر الفئة
+        if ($request->filled('category_id')) {
+            $query->whereHas('rank', function($q) use ($request) {
+                $q->where('category_id', $request->category_id);
+            });
         }
         
         // فلتر الرتبة
@@ -38,98 +41,62 @@ class PersonController extends Controller
         }
         
         $persons = $query->paginate(50)->withQueryString();
-        $types = Type::all();
+        $categories = RankCategory::all();
         $ranks = Rank::all();
         
-        return view('persons.index', compact('persons', 'types', 'ranks'));
+        return view('persons.index', compact('persons', 'categories', 'ranks'));
     }
 
     public function create()
     {
-        $types = Type::all();
+        $categories = RankCategory::all();
         $ranks = Rank::all();
-        return view('persons.create', compact('types', 'ranks'));
+        $employmentStatuses = EmploymentStatus::all();
+        return view('persons.create', compact('categories', 'ranks', 'employmentStatuses'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'file_no' => 'required|string|max:20',
-            'national_no' => 'required|string|max:20|unique:persons',
-            'name' => 'required|string|max:100',
-            'type_id' => 'required|exists:types,id',
-            'rank_id' => 'required|exists:ranks,id',
-            'military_no' => 'nullable|string|max:20'
+            'file_type' => 'required|string',
+            'file_number' => 'required|string',
+            'national_id' => 'required|string|unique:persons',
+            'name' => 'required|string',
+            'rank_id' => 'required|exists:ranks,id'
         ]);
 
-        $person = Person::create($request->only(['file_no', 'national_no', 'name', 'type_id', 'rank_id']));
-
-        $type = Type::find($request->type_id);
-        if ($type->type_name === 'ضابط صف' && $request->military_no) {
-            MilitaryInfo::create([
-                'national_no' => $request->national_no,
-                'military_no' => $request->military_no
-            ]);
-        }
+        $person = Person::create($request->only([
+            'file_type', 'file_number', 'name', 'rank_id', 'birth_date', 'birth_place',
+            'gender', 'mother_name', 'mother_nationality', 'blood_type', 'national_id',
+            'personal_card_number', 'passport_number'
+        ]));
 
         return redirect()->route('persons.index')->with('success', 'تم حفظ البيانات بنجاح');
     }
 
     public function edit(Person $person)
     {
-        $types = Type::all();
-        $ranks = Rank::where('type_id', $person->type_id)->get();
-        return view('persons.edit', compact('person', 'types', 'ranks'));
+        $categories = RankCategory::all();
+        $ranks = Rank::all();
+        $employmentStatuses = EmploymentStatus::all();
+        return view('persons.edit', compact('person', 'categories', 'ranks', 'employmentStatuses'));
     }
 
     public function update(Request $request, Person $person)
     {
         $request->validate([
-            'file_no' => 'required|string|max:20',
-            'national_no' => 'required|string|max:20|unique:persons,national_no,' . $person->system_no . ',system_no',
-            'name' => 'required|string|max:100',
-            'type_id' => 'required|exists:types,id',
-            'rank_id' => 'required|exists:ranks,id',
-            'military_no' => 'nullable|string|max:20'
+            'file_type' => 'required|string',
+            'file_number' => 'required|string',
+            'national_id' => 'required|string|unique:persons,national_id,' . $person->id,
+            'name' => 'required|string',
+            'rank_id' => 'required|exists:ranks,id'
         ]);
 
-        // تحديد مستوى الصفة
-        $typeHierarchy = ['موظف' => 1, 'ضابط صف' => 2, 'ضابط' => 3];
-        $oldType = $person->type;
-        $newType = Type::find($request->type_id);
-        
-        $oldLevel = $typeHierarchy[$oldType->type_name];
-        $newLevel = $typeHierarchy[$newType->type_name];
-        
-        // إذا كانت ترقية (من مستوى أقل إلى أعلى)
-        if ($newLevel > $oldLevel) {
-            PendingRequest::create([
-                'person_id' => $person->system_no,
-                'old_type_id' => $person->type_id,
-                'new_type_id' => $request->type_id,
-                'old_rank_id' => $person->rank_id,
-                'new_rank_id' => $request->rank_id,
-                'old_military_no' => $person->militaryInfo?->military_no,
-                'new_military_no' => $request->military_no,
-                'status' => 'pending'
-            ]);
-            
-            return redirect()->route('persons.index')->with('success', 'تم إرسال طلب الترقية للموافقة');
-        }
-        
-        // تحديث عادي للبيانات الأخرى
-        $person->update($request->only(['file_no', 'national_no', 'name', 'type_id', 'rank_id']));
-
-        if ($newType->type_name === 'ضابط صف') {
-            if ($request->military_no) {
-                MilitaryInfo::updateOrCreate(
-                    ['national_no' => $request->national_no],
-                    ['military_no' => $request->military_no]
-                );
-            }
-        } else {
-            MilitaryInfo::where('national_no', $person->national_no)->delete();
-        }
+        $person->update($request->only([
+            'file_type', 'file_number', 'name', 'rank_id', 'birth_date', 'birth_place',
+            'gender', 'mother_name', 'mother_nationality', 'blood_type', 'national_id',
+            'personal_card_number', 'passport_number'
+        ]));
 
         return redirect()->route('persons.index')->with('success', 'تم تحديث البيانات بنجاح');
     }
@@ -140,9 +107,9 @@ class PersonController extends Controller
         return redirect()->route('persons.index')->with('success', 'تم حذف البيانات بنجاح');
     }
 
-    public function getRanksByType($typeId)
+    public function getRanksByCategory($categoryId)
     {
-        $ranks = Rank::where('type_id', $typeId)->get();
+        $ranks = Rank::where('category_id', $categoryId)->get();
         return response()->json($ranks);
     }
 }

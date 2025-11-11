@@ -6,23 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('ranks', function (Blueprint $table) {
             $table->id();
-            $table->string('rank_name', 100);
-            $table->unsignedBigInteger('type_id');
-            $table->foreign('type_id')->references('id')->on('types')->onDelete('cascade');
+            $table->unsignedBigInteger('category_id');
+            $table->string('rank_name');
+            $table->foreign('category_id')->references('id')->on('rank_categories')->onDelete('cascade');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('ranks');
