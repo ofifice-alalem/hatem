@@ -60,6 +60,21 @@
         .gradient-blue {
             background: linear-gradient(135deg, #667eea 0%, #4c6ef5 100%);
         }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.5);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(102, 126, 234, 0.7);
+        }
     </style>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {{ $head ?? '' }}

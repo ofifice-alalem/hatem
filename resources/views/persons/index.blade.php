@@ -1,21 +1,21 @@
 <x-layout title="لوحة التحكم - إدارة الأشخاص">
     <x-header title="لوحة التحكم" description="إدارة ومتابعة بيانات الأشخاص في النظام">
         <x-slot name="actions">
+            <a href="{{ route('persons.create') }}" 
+               class="me-4 gradient-purple text-white text-sm font-medium py-1.5 px-3 rounded-lg transition duration-300 flex items-center gap-2 hover:opacity-90">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                </svg>
+                <span>إضافة شخص</span>
+            </a>
             <button onclick="openDeleteAllModal()" 
-                    class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex items-center space-x-2">
+                    class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-1.5 px-3 rounded-lg transition duration-300 flex items-center gap-2">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
                     <path fill-rule="evenodd" d="M4 5a2 2 0 012-2h8a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 3a1 1 0 012 0v3a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v3a1 1 0 11-2 0V8z"/>
                 </svg>
                 <span>مسح جميع المستخدمين</span>
             </button>
-            <a href="{{ route('persons.create') }}" 
-               class="bg-primary hover:bg-dark-blue-800 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex items-center space-x-2">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
-                </svg>
-                <span>إضافة شخص</span>
-            </a>
         </x-slot>
     </x-header>
 
