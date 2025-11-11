@@ -70,6 +70,16 @@
                                                     $fieldName = $fieldNames[$key] ?? $key;
                                                     $oldValue = $request->original_data[$key] ?? 'فارغ';
                                                     $newValue = $value ?? 'فارغ';
+                                                    
+                                                    // تحويل IDs إلى نصوص
+                                                    if($key == 'military_rank_id') {
+                                                        $oldValue = $ranks[$oldValue] ?? $oldValue;
+                                                        $newValue = $ranks[$newValue] ?? $newValue;
+                                                    } elseif($key == 'employment_status_id') {
+                                                        $oldValue = $employmentStatuses[$oldValue] ?? $oldValue;
+                                                        $newValue = $employmentStatuses[$newValue] ?? $newValue;
+                                                    }
+                                                    
                                                     $changes[] = [
                                                         'field' => $fieldName,
                                                         'old' => $oldValue,
@@ -196,6 +206,8 @@
 
     <script>
         const requests = @json($requests);
+        const ranks = @json($ranks);
+        const employmentStatuses = @json($employmentStatuses);
         
         function viewDetails(requestId) {
             const request = requests.find(r => r.id === requestId);
@@ -228,7 +240,13 @@
             
             Object.entries(request.original_data).forEach(([key, value]) => {
                 if (value && fieldNames[key]) {
-                    content += `<div class="text-sm"><span class="font-medium">${fieldNames[key]}:</span> ${value}</div>`;
+                    let displayValue = value;
+                    if(key === 'military_rank_id' && ranks[value]) {
+                        displayValue = ranks[value];
+                    } else if(key === 'employment_status_id' && employmentStatuses[value]) {
+                        displayValue = employmentStatuses[value];
+                    }
+                    content += `<div class="text-sm"><span class="font-medium">${fieldNames[key]}:</span> ${displayValue}</div>`;
                 }
             });
             
@@ -240,7 +258,13 @@
                 if (fieldNames[key]) {
                     const isChanged = request.original_data[key] !== value;
                     const className = isChanged ? 'text-sm font-medium text-blue-600' : 'text-sm';
-                    content += `<div class="${className}"><span class="font-medium">${fieldNames[key]}:</span> ${value || 'فارغ'}</div>`;
+                    let displayValue = value || 'فارغ';
+                    if(key === 'military_rank_id' && ranks[value]) {
+                        displayValue = ranks[value];
+                    } else if(key === 'employment_status_id' && employmentStatuses[value]) {
+                        displayValue = employmentStatuses[value];
+                    }
+                    content += `<div class="${className}"><span class="font-medium">${fieldNames[key]}:</span> ${displayValue}</div>`;
                 }
             });
             

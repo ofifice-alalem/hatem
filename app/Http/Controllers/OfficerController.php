@@ -126,17 +126,43 @@ class OfficerController extends Controller
             'name' => 'required|string'
         ]);
 
-        $newData = $request->only([
+        $requestData = $request->only([
             'file_type', 'file_number', 'name', 'birth_date', 'birth_place',
             'gender', 'mother_name', 'mother_nationality', 'blood_type', 'national_id',
             'personal_card_number', 'passport_number'
         ]);
 
+        // فلترة الحقول المتغيرة فقط
+        $originalData = $officer->only(array_keys($requestData));
+        $changedData = [];
+        
+        foreach($requestData as $key => $value) {
+            if($originalData[$key] != $value) {
+                $changedData[$key] = $value;
+            }
+        }
+
+        // تحديث المعلومات العسكرية
+        if ($request->filled('military_rank_id')) {
+            $officer->militaryInfo()->updateOrCreate(
+                ['national_id' => $officer->national_id],
+                [
+                    'military_rank_id' => $request->military_rank_id,
+                    'military_number' => $request->military_number
+                ]
+            );
+            $officer->update(['rank_id' => $request->military_rank_id]);
+        }
+
+        if(empty($changedData)) {
+            return redirect()->route('officers.index')->with('info', 'لم يتم إجراء أي تغييرات');
+        }
+
         PendingRequest::create([
             'type' => 'person',
             'record_id' => $officer->id,
-            'original_data' => $officer->toArray(),
-            'new_data' => $newData,
+            'original_data' => $originalData,
+            'new_data' => $changedData,
             'requested_by' => 'المستخدم الحالي'
         ]);
 

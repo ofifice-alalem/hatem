@@ -132,6 +132,32 @@
                 </div>
             </div>
 
+            <!-- المعلومات العسكرية -->
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">المعلومات العسكرية</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الرتبة</label>
+                        <select name="military_rank_id" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                            <option value="">اختر الرتبة</option>
+                            @foreach($ranks as $rank)
+                                <option value="{{ $rank->id }}" {{ old('military_rank_id', $nonCommissionedOfficer->militaryInfo?->military_rank_id) == $rank->id ? 'selected' : '' }}>
+                                    {{ $rank->rank_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الرقم العسكري</label>
+                        <input type="text" name="military_number" value="{{ old('military_number', $nonCommissionedOfficer->militaryInfo?->military_number) }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                               placeholder="أدخل الرقم العسكري">
+                    </div>
+                </div>
+            </div>
+
             <div class="flex justify-end gap-4 pt-6 border-t border-gray-100">
                 <a href="{{ route('non-commissioned-officers.index') }}" 
                    class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">

@@ -15,7 +15,12 @@ class PendingRequestController extends Controller
         $requests = PendingRequest::where('status', 'pending')
                                  ->orderBy('created_at', 'desc')
                                  ->get();
-        return view('pending.index', compact('requests'));
+        
+        // جلب البيانات المرجعية لتحويل IDs إلى نصوص
+        $ranks = \App\Models\Rank::pluck('rank_name', 'id');
+        $employmentStatuses = \App\Models\EmploymentStatus::pluck('status_name', 'id');
+        
+        return view('pending.index', compact('requests', 'ranks', 'employmentStatuses'));
     }
 
     public function approve($id)

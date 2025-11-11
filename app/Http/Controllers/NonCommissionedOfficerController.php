@@ -133,6 +133,18 @@ class NonCommissionedOfficerController extends Controller
             'personal_card_number', 'passport_number'
         ]);
 
+        // تحديث المعلومات العسكرية
+        if ($request->filled('military_rank_id')) {
+            $nonCommissionedOfficer->militaryInfo()->updateOrCreate(
+                ['national_id' => $nonCommissionedOfficer->national_id],
+                [
+                    'military_rank_id' => $request->military_rank_id,
+                    'military_number' => $request->military_number
+                ]
+            );
+            $nonCommissionedOfficer->update(['rank_id' => $request->military_rank_id]);
+        }
+
         PendingRequest::create([
             'type' => 'person',
             'record_id' => $nonCommissionedOfficer->id,

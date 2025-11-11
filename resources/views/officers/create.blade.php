@@ -170,6 +170,44 @@
                                placeholder="أدخل جهة التعيين">
                     </div>
                 </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">رقم قرار التعيين</label>
+                        <input type="text" name="appointment_decision_number" value="{{ old('appointment_decision_number') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                               placeholder="أدخل رقم قرار التعيين">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ آخر ترفيع</label>
+                        <input type="date" name="last_promotion_date" value="{{ old('last_promotion_date') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">قرار آخر ترفيع</label>
+                        <input type="text" name="last_promotion_decision" value="{{ old('last_promotion_decision') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                               placeholder="أدخل قرار آخر ترفيع">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">سنة آخر ترفيع</label>
+                        <input type="number" name="last_promotion_year" value="{{ old('last_promotion_year') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                               placeholder="أدخل سنة آخر ترفيع" min="1950" max="{{ date('Y') }}">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الأقدمية</label>
+                        <input type="text" name="seniority" value="{{ old('seniority') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                               placeholder="أدخل الأقدمية">
+                    </div>
+                </div>
             </div>
 
             <!-- معلومات العمل -->
@@ -230,6 +268,72 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">تفاصيل الحالة الوظيفية</label>
+                        <textarea name="employment_status_detail" rows="3" 
+                                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                                  placeholder="أدخل تفاصيل الحالة الوظيفية">{{ old('employment_status_detail') }}</textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">ملاحظات الوظيفة</label>
+                        <textarea name="employment_notes" rows="3" 
+                                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                                  placeholder="أدخل ملاحظات الوظيفة">{{ old('employment_notes') }}</textarea>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ المباشرة</label>
+                        <input type="date" name="direct_date" value="{{ old('direct_date') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">جنسية الزوجة</label>
+                        <input type="text" name="wife_nationality" value="{{ old('wife_nationality') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                               placeholder="أدخل جنسية الزوجة">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">رقم قرار النقل</label>
+                        <input type="text" name="transfer_decision_number" value="{{ old('transfer_decision_number') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                               placeholder="أدخل رقم قرار النقل">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ النقل</label>
+                        <input type="date" name="transfer_date" value="{{ old('transfer_date') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">جهة النقل</label>
+                        <input type="text" name="transfer_authority" value="{{ old('transfer_authority') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                               placeholder="أدخل جهة النقل">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الدرجة العلمية</label>
+                        <input type="text" name="academic_degree" value="{{ old('academic_degree') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                               placeholder="أدخل الدرجة العلمية">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ الدرجة العلمية</label>
+                        <input type="date" name="academic_degree_date" value="{{ old('academic_degree_date') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                    </div>
+
                     <div class="flex items-center">
                         <input type="checkbox" name="reviewed" value="1" {{ old('reviewed') ? 'checked' : '' }} 
                                class="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary focus:ring-2">
@@ -307,6 +411,15 @@
             document.querySelector('input[name="appointment_date"]').value = `${appointmentYear}-${appointmentMonth}-${appointmentDay}`;
             
             document.querySelector('input[name="appointment_authority"]').value = 'وزارة الدفاع';
+            document.querySelector('input[name="appointment_decision_number"]').value = 'ق/' + Math.floor(Math.random() * 9000) + 1000;
+            
+            const promotionYear = new Date().getFullYear() - Math.floor(Math.random() * 5);
+            const promotionMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+            const promotionDay = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+            document.querySelector('input[name="last_promotion_date"]').value = `${promotionYear}-${promotionMonth}-${promotionDay}`;
+            document.querySelector('input[name="last_promotion_decision"]').value = 'ق.ت/' + Math.floor(Math.random() * 9000) + 1000;
+            document.querySelector('input[name="last_promotion_year"]').value = promotionYear;
+            document.querySelector('input[name="seniority"]').value = Math.floor(Math.random() * 20) + 1;
             
             const workAuthorities = ['وزارة الدفاع', 'الأركان العامة', 'القيادة العامة للجيش'];
             document.querySelector('input[name="work_authority"]').value = workAuthorities[Math.floor(Math.random() * workAuthorities.length)];
@@ -320,6 +433,30 @@
                 const randomStatus = Math.floor(Math.random() * (employmentStatusSelect.options.length - 1)) + 1;
                 employmentStatusSelect.selectedIndex = randomStatus;
             }
+            
+            document.querySelector('textarea[name="employment_status_detail"]').value = 'تفاصيل الحالة الوظيفية';
+            document.querySelector('textarea[name="employment_notes"]').value = 'ملاحظات عامة';
+            
+            const directYear = new Date().getFullYear() - Math.floor(Math.random() * 3);
+            const directMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+            const directDay = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+            document.querySelector('input[name="direct_date"]').value = `${directYear}-${directMonth}-${directDay}`;
+            document.querySelector('input[name="wife_nationality"]').value = 'سورية';
+            document.querySelector('input[name="transfer_decision_number"]').value = 'ن/' + Math.floor(Math.random() * 9000) + 1000;
+            
+            const transferYear = new Date().getFullYear() - Math.floor(Math.random() * 2);
+            const transferMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+            const transferDay = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+            document.querySelector('input[name="transfer_date"]').value = `${transferYear}-${transferMonth}-${transferDay}`;
+            document.querySelector('input[name="transfer_authority"]').value = workAuthorities[Math.floor(Math.random() * workAuthorities.length)];
+            
+            const degrees = ['بكالوريوس', 'ماجستير', 'دكتوراه', 'دبلوم'];
+            document.querySelector('input[name="academic_degree"]').value = degrees[Math.floor(Math.random() * degrees.length)];
+            
+            const degreeYear = new Date().getFullYear() - (5 + Math.floor(Math.random() * 15));
+            const degreeMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+            const degreeDay = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+            document.querySelector('input[name="academic_degree_date"]').value = `${degreeYear}-${degreeMonth}-${degreeDay}`;
             
             document.querySelector('input[name="reviewed"]').checked = Math.random() > 0.3;
             document.querySelector('input[name="leadership"]').checked = Math.random() > 0.4;

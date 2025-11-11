@@ -45,8 +45,12 @@ class MilitaryInfoController extends Controller
 
     public function edit($id)
     {
-        $militaryInfo = MilitaryInfo::with('person')->findOrFail($id);
-        $ranks = Rank::with('category')->get();
+        $militaryInfo = MilitaryInfo::with('person.rank.category')->findOrFail($id);
+        
+        // فلترة الرتب حسب فئة الشخص
+        $categoryId = $militaryInfo->person->rank->category_id ?? null;
+        $ranks = $categoryId ? Rank::where('category_id', $categoryId)->get() : Rank::all();
+        
         return view('military-info.edit', compact('militaryInfo', 'ranks'));
     }
 

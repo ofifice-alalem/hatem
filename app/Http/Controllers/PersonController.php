@@ -136,18 +136,32 @@ class PersonController extends Controller
             'name' => 'required|string'
         ]);
 
-        $newData = $request->only([
+        $requestData = $request->only([
             'file_type', 'file_number', 'name', 'birth_date', 'birth_place',
             'gender', 'mother_name', 'mother_nationality', 'blood_type', 'national_id',
             'personal_card_number', 'passport_number'
         ]);
 
+        // فلترة الحقول المتغيرة فقط
+        $originalData = $person->only(array_keys($requestData));
+        $changedData = [];
+        
+        foreach($requestData as $key => $value) {
+            if($originalData[$key] != $value) {
+                $changedData[$key] = $value;
+            }
+        }
+
+        if(empty($changedData)) {
+            return redirect()->route('persons.index')->with('info', 'لم يتم إجراء أي تغييرات');
+        }
+
         // إنشاء طلب معلق للموافقة
         PendingRequest::create([
             'type' => 'person',
             'record_id' => $person->id,
-            'original_data' => $person->toArray(),
-            'new_data' => $newData,
+            'original_data' => $originalData,
+            'new_data' => $changedData,
             'requested_by' => 'المستخدم الحالي'
         ]);
 
