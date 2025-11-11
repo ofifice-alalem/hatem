@@ -127,29 +127,68 @@ class NonCommissionedOfficerController extends Controller
             'name' => 'required|string'
         ]);
 
-        $newData = $request->only([
+        $requestData = $request->only([
             'file_type', 'file_number', 'name', 'birth_date', 'birth_place',
             'gender', 'mother_name', 'mother_nationality', 'blood_type', 'national_id',
             'personal_card_number', 'passport_number'
         ]);
 
+        // فلترة الحقول المتغيرة فقط
+        $originalData = $nonCommissionedOfficer->only(array_keys($requestData));
+        $changedData = [];
+        
+        foreach($requestData as $key => $value) {
+            if($originalData[$key] != $value) {
+                $changedData[$key] = $value;
+            }
+        }
+
         // تحديث المعلومات العسكرية
-        if ($request->filled('military_rank_id')) {
+        $militaryChangedData = [];
+        $militaryOriginalData = [];
+        if ($request->filled('military_rank_id') || $request->filled('military_number')) {
+            $militaryRequestData = $request->only([
+                'military_rank_id', 'military_number', 'appointment_date', 'appointment_authority',
+                'appointment_decision_number', 'last_promotion_date', 'last_promotion_decision',
+                'last_promotion_year', 'seniority'
+            ]);
+            $militaryInfo = $nonCommissionedOfficer->militaryInfo;
+            
+            if ($militaryInfo) {
+                $militaryOriginalData = $militaryInfo->only(array_keys($militaryRequestData));
+                foreach($militaryRequestData as $key => $value) {
+                    if($militaryOriginalData[$key] != $value) {
+                        $militaryChangedData[$key] = $value;
+                    }
+                }
+            } else {
+                $militaryChangedData = $militaryRequestData;
+                $militaryOriginalData = array_fill_keys(array_keys($militaryRequestData), null);
+            }
+            
             $nonCommissionedOfficer->militaryInfo()->updateOrCreate(
                 ['national_id' => $nonCommissionedOfficer->national_id],
-                [
-                    'military_rank_id' => $request->military_rank_id,
-                    'military_number' => $request->military_number
-                ]
+                array_filter($militaryRequestData, function($value) { return $value !== null; })
             );
-            $nonCommissionedOfficer->update(['rank_id' => $request->military_rank_id]);
+            
+            if ($request->filled('military_rank_id')) {
+                $nonCommissionedOfficer->update(['rank_id' => $request->military_rank_id]);
+            }
+        }
+
+        // دمج جميع التغييرات
+        $allChangedData = array_merge($changedData, $militaryChangedData);
+        $allOriginalData = array_merge($originalData, $militaryOriginalData);
+
+        if(empty($allChangedData)) {
+            return redirect()->route('non-commissioned-officers.index')->with('info', 'لم يتم إجراء أي تغييرات');
         }
 
         PendingRequest::create([
             'type' => 'person',
             'record_id' => $nonCommissionedOfficer->id,
-            'original_data' => $nonCommissionedOfficer->toArray(),
-            'new_data' => $newData,
+            'original_data' => $allOriginalData,
+            'new_data' => $allChangedData,
             'requested_by' => 'المستخدم الحالي'
         ]);
 

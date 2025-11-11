@@ -143,26 +143,51 @@ class OfficerController extends Controller
         }
 
         // تحديث المعلومات العسكرية
-        if ($request->filled('military_rank_id')) {
+        $militaryChangedData = [];
+        $militaryOriginalData = [];
+        if ($request->filled('military_rank_id') || $request->filled('military_number')) {
+            $militaryRequestData = $request->only([
+                'military_rank_id', 'military_number', 'appointment_date', 'appointment_authority',
+                'appointment_decision_number', 'last_promotion_date', 'last_promotion_decision',
+                'last_promotion_year', 'seniority'
+            ]);
+            $militaryInfo = $officer->militaryInfo;
+            
+            if ($militaryInfo) {
+                $militaryOriginalData = $militaryInfo->only(array_keys($militaryRequestData));
+                foreach($militaryRequestData as $key => $value) {
+                    if($militaryOriginalData[$key] != $value) {
+                        $militaryChangedData[$key] = $value;
+                    }
+                }
+            } else {
+                $militaryChangedData = $militaryRequestData;
+                $militaryOriginalData = array_fill_keys(array_keys($militaryRequestData), null);
+            }
+            
             $officer->militaryInfo()->updateOrCreate(
                 ['national_id' => $officer->national_id],
-                [
-                    'military_rank_id' => $request->military_rank_id,
-                    'military_number' => $request->military_number
-                ]
+                array_filter($militaryRequestData, function($value) { return $value !== null; })
             );
-            $officer->update(['rank_id' => $request->military_rank_id]);
+            
+            if ($request->filled('military_rank_id')) {
+                $officer->update(['rank_id' => $request->military_rank_id]);
+            }
         }
 
-        if(empty($changedData)) {
+        // دمج جميع التغييرات
+        $allChangedData = array_merge($changedData, $militaryChangedData);
+        $allOriginalData = array_merge($originalData, $militaryOriginalData);
+
+        if(empty($allChangedData)) {
             return redirect()->route('officers.index')->with('info', 'لم يتم إجراء أي تغييرات');
         }
 
         PendingRequest::create([
             'type' => 'person',
             'record_id' => $officer->id,
-            'original_data' => $originalData,
-            'new_data' => $changedData,
+            'original_data' => $allOriginalData,
+            'new_data' => $allChangedData,
             'requested_by' => 'المستخدم الحالي'
         ]);
 

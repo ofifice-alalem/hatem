@@ -58,18 +58,53 @@
                                                 'name' => 'الاسم',
                                                 'national_id' => 'الرقم الوطني',
                                                 'file_number' => 'رقم الملف',
+                                                'file_type' => 'نوع الملف',
                                                 'birth_date' => 'تاريخ الميلاد',
+                                                'birth_place' => 'مكان الميلاد',
                                                 'gender' => 'الجنس',
+                                                'mother_name' => 'اسم الأم',
+                                                'mother_nationality' => 'جنسية الأم',
+                                                'blood_type' => 'فصيلة الدم',
+                                                'personal_card_number' => 'رقم البطاقة',
+                                                'passport_number' => 'رقم الجواز',
                                                 'military_number' => 'الرقم العسكري',
                                                 'military_rank_id' => 'الرتبة',
-                                                'work_authority' => 'جهة العمل'
+                                                'appointment_date' => 'تاريخ التعيين',
+                                                'appointment_authority' => 'جهة التعيين',
+                                                'appointment_decision_number' => 'رقم قرار التعيين',
+                                                'last_promotion_date' => 'تاريخ آخر ترفيع',
+                                                'last_promotion_decision' => 'قرار آخر ترفيع',
+                                                'last_promotion_year' => 'سنة آخر ترفيع',
+                                                'seniority' => 'الأقدمية',
+                                                'work_authority' => 'جهة العمل',
+                                                'work_location' => 'مكان العمل',
+                                                'office' => 'المكتب',
+                                                'assigned_task' => 'العمل المكلف به',
+                                                'employment_status_id' => 'الحالة الوظيفية',
+                                                'employment_status_detail' => 'تفاصيل الحالة الوظيفية',
+                                                'employment_notes' => 'ملاحظات الوظيفة',
+                                                'financial_number' => 'الرقم المالي',
+                                                'direct_date' => 'تاريخ المباشرة',
+                                                'wife_nationality' => 'جنسية الزوجة',
+                                                'transfer_decision_number' => 'رقم قرار النقل',
+                                                'transfer_date' => 'تاريخ النقل',
+                                                'transfer_authority' => 'جهة النقل',
+                                                'academic_degree' => 'الدرجة العلمية',
+                                                'academic_degree_date' => 'تاريخ الدرجة العلمية',
+                                                'reviewed' => 'تمت المراجعة',
+                                                'leadership' => 'قيادي'
                                             ];
                                             
                                             foreach($request->new_data as $key => $value) {
-                                                if(isset($request->original_data[$key]) && $request->original_data[$key] != $value) {
-                                                    $fieldName = $fieldNames[$key] ?? $key;
+                                                if(isset($fieldNames[$key])) {
+                                                    $fieldName = $fieldNames[$key];
                                                     $oldValue = $request->original_data[$key] ?? 'فارغ';
                                                     $newValue = $value ?? 'فارغ';
+                                                    
+                                                    // إخفاء الحقول الفارغة للتواريخ
+                                                    if(in_array($key, ['appointment_date', 'last_promotion_date', 'transfer_date', 'direct_date', 'academic_degree_date']) && (empty($oldValue) || $oldValue == 'فارغ') && (empty($newValue) || $newValue == 'فارغ')) {
+                                                        continue;
+                                                    }
                                                     
                                                     // تحويل IDs إلى نصوص
                                                     if($key == 'military_rank_id') {
@@ -89,7 +124,7 @@
                                             }
                                         @endphp
                                         @if(count($changes) > 0)
-                                            @foreach(array_slice($changes, 0, 3) as $change)
+                                            @foreach($changes as $change)
                                                 <div class="mb-1 p-2 bg-yellow-50 rounded border-r-2 border-yellow-400">
                                                     <div class="text-xs font-medium text-gray-700">{{ $change['field'] }}</div>
                                                     <div class="text-xs text-gray-600">
@@ -99,9 +134,6 @@
                                                     </div>
                                                 </div>
                                             @endforeach
-                                            @if(count($changes) > 3)
-                                                <div class="text-xs text-gray-500 mt-1">و {{ count($changes) - 3 }} تغيير آخر...</div>
-                                            @endif
                                         @else
                                             <span class="text-xs text-gray-500">لا توجد تغييرات</span>
                                         @endif
@@ -162,7 +194,7 @@
         <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-900">تفاصيل طلب التعديل</h3>
+                    <h3 class="text-xl font-bold text-gray-900">مقارنة التغييرات</h3>
                     <button onclick="closeDetailsModal()" class="text-gray-400 hover:text-gray-600">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -233,42 +265,49 @@
             };
             
             let content = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h4 class="font-semibold text-gray-900 mb-3">البيانات الحالية</h4>
-                        <div class="space-y-2">`;
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">الحقل</th>
+                                <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">القيمة القديمة</th>
+                                <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">القيمة الجديدة</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">`;
             
-            Object.entries(request.original_data).forEach(([key, value]) => {
-                if (value && fieldNames[key]) {
-                    let displayValue = value;
-                    if(key === 'military_rank_id' && ranks[value]) {
-                        displayValue = ranks[value];
-                    } else if(key === 'employment_status_id' && employmentStatuses[value]) {
-                        displayValue = employmentStatuses[value];
-                    }
-                    content += `<div class="text-sm"><span class="font-medium">${fieldNames[key]}:</span> ${displayValue}</div>`;
-                }
-            });
-            
-            content += `</div></div><div class="bg-blue-50 p-4 rounded-lg">
-                        <h4 class="font-semibold text-gray-900 mb-3">البيانات الجديدة</h4>
-                        <div class="space-y-2">`;
-            
-            Object.entries(request.new_data).forEach(([key, value]) => {
+            Object.entries(request.new_data).forEach(([key, newValue]) => {
                 if (fieldNames[key]) {
-                    const isChanged = request.original_data[key] !== value;
-                    const className = isChanged ? 'text-sm font-medium text-blue-600' : 'text-sm';
-                    let displayValue = value || 'فارغ';
-                    if(key === 'military_rank_id' && ranks[value]) {
-                        displayValue = ranks[value];
-                    } else if(key === 'employment_status_id' && employmentStatuses[value]) {
-                        displayValue = employmentStatuses[value];
+                    const oldValue = request.original_data && request.original_data[key] !== undefined ? request.original_data[key] : 'فارغ';
+                    
+                    // إخفاء الحقول الفارغة للتواريخ
+                    if(['appointment_date', 'last_promotion_date', 'transfer_date', 'direct_date', 'academic_degree_date'].includes(key) && 
+                       (!oldValue || oldValue === 'فارغ' || oldValue === null) && (!newValue || newValue === 'فارغ' || newValue === null)) {
+                        return;
                     }
-                    content += `<div class="${className}"><span class="font-medium">${fieldNames[key]}:</span> ${displayValue}</div>`;
+                    
+                    let displayOldValue = oldValue || 'فارغ';
+                    let displayNewValue = newValue || 'فارغ';
+                    
+                    // تحويل IDs إلى نصوص
+                    if(key === 'military_rank_id') {
+                        displayOldValue = ranks[oldValue] || displayOldValue;
+                        displayNewValue = ranks[newValue] || displayNewValue;
+                    } else if(key === 'employment_status_id') {
+                        displayOldValue = employmentStatuses[oldValue] || displayOldValue;
+                        displayNewValue = employmentStatuses[newValue] || displayNewValue;
+                    }
+                    
+                    content += `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">${fieldNames[key]}</td>
+                            <td class="px-4 py-3 text-sm text-red-600 line-through">${displayOldValue}</td>
+                            <td class="px-4 py-3 text-sm text-green-600 font-medium">${displayNewValue}</td>
+                        </tr>`;
                 }
             });
             
-            content += `</div></div></div>`;
+            content += `</tbody></table></div>`;
             
             document.getElementById('detailsContent').innerHTML = content;
             document.getElementById('detailsModal').classList.remove('hidden');

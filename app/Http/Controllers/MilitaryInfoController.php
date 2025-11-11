@@ -70,12 +70,32 @@ class MilitaryInfoController extends Controller
             'seniority' => 'nullable|string'
         ]);
 
+        $requestData = $request->only([
+            'military_rank_id', 'military_number', 'appointment_date', 'appointment_authority',
+            'appointment_decision_number', 'last_promotion_date', 'last_promotion_decision',
+            'last_promotion_year', 'seniority'
+        ]);
+
+        // فلترة الحقول المتغيرة فقط
+        $originalData = $militaryInfo->only(array_keys($requestData));
+        $changedData = [];
+        
+        foreach($requestData as $key => $value) {
+            if($originalData[$key] != $value) {
+                $changedData[$key] = $value;
+            }
+        }
+
+        if(empty($changedData)) {
+            return redirect()->route('persons.index')->with('info', 'لم يتم إجراء أي تغييرات');
+        }
+
         // إنشاء طلب معلق للموافقة
         PendingRequest::create([
             'type' => 'military_info',
             'record_id' => $militaryInfo->id,
-            'original_data' => $militaryInfo->toArray(),
-            'new_data' => $request->all(),
+            'original_data' => $originalData,
+            'new_data' => $changedData,
             'requested_by' => 'المستخدم الحالي'
         ]);
 
