@@ -20,6 +20,9 @@ Route::delete('/persons-delete-all', [PersonController::class, 'deleteAll'])->na
 Route::get('/api/ranks/{categoryId}', [PersonController::class, 'getRanksByCategory'])->name('ranks.by.category');
 Route::get('/persons/{person}/change-rank', [PersonController::class, 'changeRank'])->name('persons.change-rank');
 Route::put('/persons/{person}/update-rank', [PersonController::class, 'updateRank'])->name('persons.update-rank');
+Route::get('/change-officer-rank', [PersonController::class, 'changeOfficerRank'])->name('persons.change-officer-rank');
+Route::get('/change-nco-rank', [PersonController::class, 'changeNcoRank'])->name('persons.change-nco-rank');
+Route::get('/change-employee-rank', [PersonController::class, 'changeEmployeeRank'])->name('persons.change-employee-rank');
 
 // الضباط
 Route::resource('officers', OfficerController::class);

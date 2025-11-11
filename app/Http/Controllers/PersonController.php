@@ -312,4 +312,64 @@ class PersonController extends Controller
 
         return redirect()->route('persons.index')->with('success', 'تم إرسال طلب تغيير الرتبة للمراجعة');
     }
+
+    public function changeOfficerRank(Request $request)
+    {
+        $query = Person::whereHas('rank.category', function($q) {
+            $q->where('id', 1); // ضباط
+        })->with(['rank.category', 'militaryInfo']);
+        
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('national_id', $search);
+            });
+        }
+        
+        $persons = $query->get();
+        $ranks = Rank::where('category_id', 1)->get();
+        return view('persons.change-officer-rank', compact('persons', 'ranks'));
+    }
+
+    public function changeNcoRank(Request $request)
+    {
+        $query = Person::whereHas('rank.category', function($q) {
+            $q->where('id', 2); // ضباط صف
+        })->with(['rank.category', 'militaryInfo']);
+        
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('national_id', $search)
+                  ->orWhereHas('militaryInfo', function($mq) use ($search) {
+                      $mq->where('military_number', $search);
+                  });
+            });
+        }
+        
+        $persons = $query->get();
+        $ranks = Rank::where('category_id', 2)->get();
+        return view('persons.change-nco-rank', compact('persons', 'ranks'));
+    }
+
+    public function changeEmployeeRank(Request $request)
+    {
+        $query = Person::whereHas('rank.category', function($q) {
+            $q->where('id', 3); // موظفين
+        })->with(['rank.category', 'militaryInfo']);
+        
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('national_id', $search);
+            });
+        }
+        
+        $persons = $query->get();
+        $ranks = Rank::where('category_id', 3)->get();
+        return view('persons.change-employee-rank', compact('persons', 'ranks'));
+    }
 }
