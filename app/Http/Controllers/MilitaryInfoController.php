@@ -34,7 +34,10 @@ class MilitaryInfoController extends Controller
             'seniority' => 'nullable|string'
         ]);
 
-        MilitaryInfo::create($request->all());
+        $person = Person::where('national_id', $request->national_id)->first();
+        $data = $request->all();
+        $data['category_id'] = $person && $person->rank ? $person->rank->category_id : null;
+        MilitaryInfo::create($data);
         
         // تحديث الرتبة في جدول persons
         Person::where('national_id', $request->national_id)

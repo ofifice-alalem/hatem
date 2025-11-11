@@ -27,6 +27,7 @@
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
         <form action="{{ route('non-commissioned-officers.store') }}" method="POST" class="space-y-6">
             @csrf
+            <input type="hidden" name="category_id" value="2">
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>

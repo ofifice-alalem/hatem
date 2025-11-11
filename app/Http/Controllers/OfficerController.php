@@ -72,6 +72,7 @@ class OfficerController extends Controller
 
         MilitaryInfo::create([
             'national_id' => $person->national_id,
+            'category_id' => $request->category_id ?: $this->categoryId,
             'military_rank_id' => $request->military_rank_id,
             'military_number' => $request->military_number,
             'appointment_date' => $request->appointment_date,

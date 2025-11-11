@@ -72,9 +72,11 @@ class PersonController extends Controller
         ]));
 
         // إنشاء المعلومات العسكرية إذا تم إدخالها
-        if ($request->filled('military_rank_id') || $request->filled('military_number')) {
+        if ($request->filled('military_rank_id') || $request->filled('military_number') || $request->filled('category_id')) {
+            $rank = Rank::find($request->military_rank_id);
             $militaryInfo = MilitaryInfo::create([
                 'national_id' => $person->national_id,
+                'category_id' => $request->category_id ?: ($rank ? $rank->category_id : null),
                 'military_rank_id' => $request->military_rank_id,
                 'military_number' => $request->military_number,
                 'appointment_date' => $request->appointment_date,

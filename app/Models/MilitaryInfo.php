@@ -9,7 +9,7 @@ class MilitaryInfo extends Model
     protected $table = 'military_info';
     
     protected $fillable = [
-        'national_id', 'military_rank_id', 'military_number', 'appointment_date',
+        'national_id', 'category_id', 'military_rank_id', 'military_number', 'appointment_date',
         'appointment_authority', 'appointment_decision_number', 'last_promotion_date',
         'last_promotion_decision', 'last_promotion_year', 'seniority'
     ];
