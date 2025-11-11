@@ -18,6 +18,8 @@ Route::get('/', function () {
 Route::resource('persons', PersonController::class);
 Route::delete('/persons-delete-all', [PersonController::class, 'deleteAll'])->name('persons.delete.all');
 Route::get('/api/ranks/{categoryId}', [PersonController::class, 'getRanksByCategory'])->name('ranks.by.category');
+Route::get('/persons/{person}/change-rank', [PersonController::class, 'changeRank'])->name('persons.change-rank');
+Route::put('/persons/{person}/update-rank', [PersonController::class, 'updateRank'])->name('persons.update-rank');
 
 // الضباط
 Route::resource('officers', OfficerController::class);

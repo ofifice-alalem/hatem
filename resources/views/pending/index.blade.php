@@ -30,9 +30,11 @@
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                         @if($request->type == 'person') bg-blue-100 text-blue-800
                                         @elseif($request->type == 'military_info') bg-green-100 text-green-800
+                                        @elseif($request->type == 'rank_change') bg-indigo-100 text-indigo-800
                                         @else bg-purple-100 text-purple-800 @endif">
                                         @if($request->type == 'person') بيانات شخصية
                                         @elseif($request->type == 'military_info') معلومات عسكرية
+                                        @elseif($request->type == 'rank_change') تغيير رتبة
                                         @else معلومات عمل @endif
                                     </span>
                                 </td>
@@ -92,7 +94,9 @@
                                                 'academic_degree' => 'الدرجة العلمية',
                                                 'academic_degree_date' => 'تاريخ الدرجة العلمية',
                                                 'reviewed' => 'تمت المراجعة',
-                                                'leadership' => 'قيادي'
+                                                'leadership' => 'قيادي',
+                                                'category_name' => 'الفئة',
+                                                'rank_name' => 'الرتبة'
                                             ];
                                             
                                             foreach($request->new_data as $key => $value) {
@@ -129,7 +133,7 @@
                                                     <div class="text-xs font-medium text-gray-700">{{ $change['field'] }}</div>
                                                     <div class="text-xs text-gray-600">
                                                         <span class="line-through text-red-500">{{ $change['old'] }}</span>
-                                                        <span class="mx-1">→</span>
+                                                        <span class="mx-1">←</span>
                                                         <span class="text-green-600 font-medium">{{ $change['new'] }}</span>
                                                     </div>
                                                 </div>
@@ -283,7 +287,9 @@
                 'academic_degree': 'الدرجة العلمية',
                 'academic_degree_date': 'تاريخ الدرجة العلمية',
                 'reviewed': 'تمت المراجعة',
-                'leadership': 'قيادي'
+                'leadership': 'قيادي',
+                'category_name': 'الفئة',
+                'rank_name': 'الرتبة'
             };
             
             let content = `
@@ -292,8 +298,8 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">الحقل</th>
-                                <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">القيمة القديمة</th>
                                 <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">القيمة الجديدة</th>
+                                <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">القيمة القديمة</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">`;
@@ -323,8 +329,8 @@
                     content += `
                         <tr class="hover:bg-gray-50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900">${fieldNames[key]}</td>
-                            <td class="px-4 py-3 text-sm text-red-600 line-through">${displayOldValue}</td>
                             <td class="px-4 py-3 text-sm text-green-600 font-medium">${displayNewValue}</td>
+                            <td class="px-4 py-3 text-sm text-red-600 line-through">${displayOldValue}</td>
                         </tr>`;
                 }
             });

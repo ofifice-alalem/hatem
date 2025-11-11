@@ -26,6 +26,7 @@ class PendingRequest extends Model
     {
         switch ($this->type) {
             case 'person':
+            case 'rank_change':
                 return Person::find($this->record_id);
             case 'military_info':
                 return MilitaryInfo::with('person')->find($this->record_id);
@@ -40,6 +41,7 @@ class PendingRequest extends Model
     {
         switch ($this->type) {
             case 'person':
+            case 'rank_change':
                 return Person::find($this->record_id);
             case 'military_info':
                 $militaryInfo = MilitaryInfo::find($this->record_id);

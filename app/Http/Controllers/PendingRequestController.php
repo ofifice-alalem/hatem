@@ -44,6 +44,37 @@ class PendingRequestController extends Controller
                 $workInfo = WorkInfo::find($pendingRequest->record_id);
                 $workInfo->update($pendingRequest->new_data);
                 break;
+                
+            case 'rank_change':
+                $person = Person::find($pendingRequest->record_id);
+                $newData = $pendingRequest->new_data;
+                
+                // تحديث رتبة الشخص
+                $person->update(['rank_id' => $newData['rank_id']]);
+                
+                // تحديث المعلومات العسكرية
+                if ($person->militaryInfo) {
+                    $updateData = [
+                        'military_rank_id' => $newData['rank_id'],
+                        'category_id' => \App\Models\Rank::find($newData['rank_id'])->category_id
+                    ];
+                    
+                    if (isset($newData['military_number'])) {
+                        $updateData['military_number'] = $newData['military_number'];
+                    }
+                    
+                    $person->militaryInfo->update($updateData);
+                } else if (isset($newData['military_number'])) {
+                    // إنشاء معلومات عسكرية جديدة
+                    $rank = \App\Models\Rank::find($newData['rank_id']);
+                    MilitaryInfo::create([
+                        'national_id' => $person->national_id,
+                        'category_id' => $rank->category_id,
+                        'military_rank_id' => $newData['rank_id'],
+                        'military_number' => $newData['military_number']
+                    ]);
+                }
+                break;
         }
         
         $pendingRequest->update([

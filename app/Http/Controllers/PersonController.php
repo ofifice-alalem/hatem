@@ -263,4 +263,53 @@ class PersonController extends Controller
         
         return redirect()->route('persons.index')->with('success', 'تم حذف جميع المستخدمين بنجاح');
     }
+
+    public function changeRank(Person $person)
+    {
+        $categories = RankCategory::all();
+        $ranks = Rank::all();
+        return view('persons.change-rank', compact('person', 'categories', 'ranks'));
+    }
+
+    public function updateRank(Request $request, Person $person)
+    {
+        $request->validate([
+            'category_id' => 'required|exists:rank_categories,id',
+            'military_rank_id' => 'required|exists:ranks,id',
+            'military_number' => 'nullable|string'
+        ]);
+
+        $rank = Rank::find($request->military_rank_id);
+        $category = RankCategory::find($request->category_id);
+        
+        // إعداد بيانات التغيير
+        $originalData = [
+            'rank_id' => $person->rank_id,
+            'category_name' => $person->rank?->category?->category_name,
+            'rank_name' => $person->rank?->rank_name
+        ];
+        
+        $newData = [
+            'rank_id' => $request->military_rank_id,
+            'category_name' => $category->category_name,
+            'rank_name' => $rank->rank_name
+        ];
+        
+        // إضافة الرقم العسكري إذا كان موجوداً
+        if ($request->filled('military_number')) {
+            $originalData['military_number'] = $person->militaryInfo?->military_number;
+            $newData['military_number'] = $request->military_number;
+        }
+        
+        // إنشاء طلب تغيير الرتبة
+        PendingRequest::create([
+            'type' => 'rank_change',
+            'record_id' => $person->id,
+            'original_data' => $originalData,
+            'new_data' => $newData,
+            'requested_by' => 'المستخدم الحالي'
+        ]);
+
+        return redirect()->route('persons.index')->with('success', 'تم إرسال طلب تغيير الرتبة للمراجعة');
+    }
 }
