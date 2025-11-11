@@ -11,13 +11,17 @@ use App\Models\EmploymentStatus;
 use App\Models\PendingRequest;
 use Illuminate\Http\Request;
 
-class PersonController extends Controller
+class NonCommissionedOfficerController extends Controller
 {
+    private $categoryId = 2; // ID فئة ضباط الصف
+
     public function index(Request $request)
     {
-        $query = Person::with(['rank.category', 'militaryInfo', 'workInfo']);
+        $query = Person::with(['rank.category', 'militaryInfo', 'workInfo'])
+                      ->whereHas('rank', function($q) {
+                          $q->where('category_id', $this->categoryId);
+                      });
         
-        // فلتر البحث النصي
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -29,31 +33,23 @@ class PersonController extends Controller
             });
         }
         
-        // فلتر الفئة
-        if ($request->filled('category_id')) {
-            $query->whereHas('rank', function($q) use ($request) {
-                $q->where('category_id', $request->category_id);
-            });
-        }
-        
-        // فلتر الرتبة
         if ($request->filled('rank_id')) {
             $query->where('rank_id', $request->rank_id);
         }
         
         $persons = $query->paginate(50)->withQueryString();
-        $categories = RankCategory::all();
-        $ranks = Rank::all();
+        $ranks = Rank::where('category_id', $this->categoryId)->get();
+        $category = RankCategory::find($this->categoryId);
         
-        return view('persons.index', compact('persons', 'categories', 'ranks'));
+        return view('non-commissioned-officers.index', compact('persons', 'ranks', 'category'));
     }
 
     public function create()
     {
-        $categories = RankCategory::all();
-        $ranks = Rank::all();
+        $ranks = Rank::where('category_id', $this->categoryId)->get();
         $employmentStatuses = EmploymentStatus::all();
-        return view('persons.create', compact('categories', 'ranks', 'employmentStatuses'));
+        $category = RankCategory::find($this->categoryId);
+        return view('non-commissioned-officers.create', compact('ranks', 'employmentStatuses', 'category'));
     }
 
     public function store(Request $request)
@@ -62,7 +58,9 @@ class PersonController extends Controller
             'file_type' => 'required|string',
             'file_number' => 'required|string',
             'national_id' => 'required|string|unique:persons',
-            'name' => 'required|string'
+            'name' => 'required|string',
+            'military_rank_id' => 'required|exists:ranks,id',
+            'military_number' => 'required|string'
         ]);
 
         $person = Person::create($request->only([
@@ -71,28 +69,21 @@ class PersonController extends Controller
             'personal_card_number', 'passport_number'
         ]));
 
-        // إنشاء المعلومات العسكرية إذا تم إدخالها
-        if ($request->filled('military_rank_id') || $request->filled('military_number')) {
-            $militaryInfo = MilitaryInfo::create([
-                'national_id' => $person->national_id,
-                'military_rank_id' => $request->military_rank_id,
-                'military_number' => $request->military_number,
-                'appointment_date' => $request->appointment_date,
-                'appointment_authority' => $request->appointment_authority,
-                'appointment_decision_number' => $request->appointment_decision_number,
-                'last_promotion_date' => $request->last_promotion_date,
-                'last_promotion_decision' => $request->last_promotion_decision,
-                'last_promotion_year' => $request->last_promotion_year,
-                'seniority' => $request->seniority
-            ]);
-            
-            // تحديث جدول persons بالرتبة من المعلومات العسكرية
-            if ($request->filled('military_rank_id')) {
-                $person->update(['rank_id' => $request->military_rank_id]);
-            }
-        }
+        $person->update(['rank_id' => $request->military_rank_id]);
 
-        // إنشاء معلومات العمل إذا تم إدخالها
+        MilitaryInfo::create([
+            'national_id' => $person->national_id,
+            'military_rank_id' => $request->military_rank_id,
+            'military_number' => $request->military_number,
+            'appointment_date' => $request->appointment_date,
+            'appointment_authority' => $request->appointment_authority,
+            'appointment_decision_number' => $request->appointment_decision_number,
+            'last_promotion_date' => $request->last_promotion_date,
+            'last_promotion_decision' => $request->last_promotion_decision,
+            'last_promotion_year' => $request->last_promotion_year,
+            'seniority' => $request->seniority
+        ]);
+
         if ($request->filled('work_authority') || $request->filled('employment_status_id')) {
             WorkInfo::create([
                 'national_id' => $person->national_id,
@@ -116,23 +107,23 @@ class PersonController extends Controller
             ]);
         }
 
-        return redirect()->route('persons.index')->with('success', 'تم حفظ البيانات بنجاح');
+        return redirect()->route('non-commissioned-officers.index')->with('success', 'تم حفظ بيانات ضابط الصف بنجاح');
     }
 
-    public function edit(Person $person)
+    public function edit(Person $nonCommissionedOfficer)
     {
-        $categories = RankCategory::all();
-        $ranks = Rank::all();
+        $ranks = Rank::where('category_id', $this->categoryId)->get();
         $employmentStatuses = EmploymentStatus::all();
-        return view('persons.edit', compact('person', 'categories', 'ranks', 'employmentStatuses'));
+        $category = RankCategory::find($this->categoryId);
+        return view('non-commissioned-officers.edit', compact('nonCommissionedOfficer', 'ranks', 'employmentStatuses', 'category'));
     }
 
-    public function update(Request $request, Person $person)
+    public function update(Request $request, Person $nonCommissionedOfficer)
     {
         $request->validate([
             'file_type' => 'required|string',
             'file_number' => 'required|string',
-            'national_id' => 'required|string|unique:persons,national_id,' . $person->id,
+            'national_id' => 'required|string|unique:persons,national_id,' . $nonCommissionedOfficer->id,
             'name' => 'required|string'
         ]);
 
@@ -142,27 +133,20 @@ class PersonController extends Controller
             'personal_card_number', 'passport_number'
         ]);
 
-        // إنشاء طلب معلق للموافقة
         PendingRequest::create([
             'type' => 'person',
-            'record_id' => $person->id,
-            'original_data' => $person->toArray(),
+            'record_id' => $nonCommissionedOfficer->id,
+            'original_data' => $nonCommissionedOfficer->toArray(),
             'new_data' => $newData,
             'requested_by' => 'المستخدم الحالي'
         ]);
 
-        return redirect()->route('persons.index')->with('success', 'تم إرسال طلب التعديل للمراجعة');
+        return redirect()->route('non-commissioned-officers.index')->with('success', 'تم إرسال طلب تعديل بيانات ضابط الصف للمراجعة');
     }
 
-    public function destroy(Person $person)
+    public function destroy(Person $nonCommissionedOfficer)
     {
         $person->delete();
-        return redirect()->route('persons.index')->with('success', 'تم حذف البيانات بنجاح');
-    }
-
-    public function getRanksByCategory($categoryId)
-    {
-        $ranks = Rank::where('category_id', $categoryId)->get();
-        return response()->json($ranks);
+        return redirect()->route('non-commissioned-officers.index')->with('success', 'تم حذف بيانات ضابط الصف بنجاح');
     }
 }

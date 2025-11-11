@@ -18,6 +18,15 @@ class Person extends Model
         'birth_date' => 'date'
     ];
 
+    protected static function booted()
+    {
+        static::updated(function ($person) {
+            if ($person->isDirty('rank_id') && $person->militaryInfo) {
+                $person->militaryInfo->updateQuietly(['military_rank_id' => $person->rank_id]);
+            }
+        });
+    }
+
     public function rank()
     {
         return $this->belongsTo(Rank::class);

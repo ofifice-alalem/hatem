@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Person;
 use App\Models\MilitaryInfo;
 use App\Models\Rank;
+use App\Models\RankCategory;
+use App\Models\PendingRequest;
 use Illuminate\Http\Request;
 
 class MilitaryInfoController extends Controller
@@ -12,8 +14,9 @@ class MilitaryInfoController extends Controller
     public function create($nationalId)
     {
         $person = Person::where('national_id', $nationalId)->firstOrFail();
+        $categories = RankCategory::all();
         $ranks = Rank::all();
-        return view('military-info.create', compact('person', 'ranks'));
+        return view('military-info.create', compact('person', 'categories', 'ranks'));
     }
 
     public function store(Request $request)
@@ -32,14 +35,18 @@ class MilitaryInfoController extends Controller
         ]);
 
         MilitaryInfo::create($request->all());
+        
+        // تحديث الرتبة في جدول persons
+        Person::where('national_id', $request->national_id)
+              ->update(['rank_id' => $request->military_rank_id]);
 
         return redirect()->route('persons.index')->with('success', 'تم حفظ المعلومات العسكرية بنجاح');
     }
 
     public function edit($id)
     {
-        $militaryInfo = MilitaryInfo::findOrFail($id);
-        $ranks = Rank::all();
+        $militaryInfo = MilitaryInfo::with('person')->findOrFail($id);
+        $ranks = Rank::with('category')->get();
         return view('military-info.edit', compact('militaryInfo', 'ranks'));
     }
 
@@ -59,8 +66,15 @@ class MilitaryInfoController extends Controller
             'seniority' => 'nullable|string'
         ]);
 
-        $militaryInfo->update($request->all());
+        // إنشاء طلب معلق للموافقة
+        PendingRequest::create([
+            'type' => 'military_info',
+            'record_id' => $militaryInfo->id,
+            'original_data' => $militaryInfo->toArray(),
+            'new_data' => $request->all(),
+            'requested_by' => 'المستخدم الحالي'
+        ]);
 
-        return redirect()->route('persons.index')->with('success', 'تم تحديث المعلومات العسكرية بنجاح');
+        return redirect()->route('persons.index')->with('success', 'تم إرسال طلب تعديل المعلومات العسكرية للمراجعة');
     }
 }

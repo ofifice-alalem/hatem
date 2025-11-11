@@ -19,6 +19,21 @@ class MilitaryInfo extends Model
         'last_promotion_date' => 'date'
     ];
 
+    protected static function booted()
+    {
+        static::updated(function ($militaryInfo) {
+            if ($militaryInfo->isDirty('military_rank_id') && $militaryInfo->person) {
+                $militaryInfo->person->updateQuietly(['rank_id' => $militaryInfo->military_rank_id]);
+            }
+        });
+
+        static::created(function ($militaryInfo) {
+            if ($militaryInfo->military_rank_id && $militaryInfo->person) {
+                $militaryInfo->person->updateQuietly(['rank_id' => $militaryInfo->military_rank_id]);
+            }
+        });
+    }
+
     public function person()
     {
         return $this->belongsTo(Person::class, 'national_id', 'national_id');

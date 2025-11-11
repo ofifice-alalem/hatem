@@ -1,0 +1,275 @@
+<x-layout title="لوحة التحكم - إدارة الموظفين">
+    <x-header title="إدارة الموظفين" description="إدارة ومتابعة بيانات الموظفين في النظام">
+        <x-slot name="actions">
+            <a href="{{ route('employees.create') }}" 
+               class="bg-primary hover:bg-dark-blue-800 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex items-center space-x-2">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                </svg>
+                <span>إضافة موظف</span>
+            </a>
+        </x-slot>
+    </x-header>
+
+    @if(session('success'))
+        <x-alert type="success" :message="session('success')" />
+    @endif
+
+    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600">إجمالي الموظفين</p>
+                <p class="text-3xl font-bold text-gray-900">{{ $persons->total() }}</p>
+                <p class="text-xs text-purple-600 mt-1">{{ $category->category_name }}</p>
+            </div>
+            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-6">
+        <div class="px-6 py-4 border-b border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-900">فلترة البحث</h3>
+        </div>
+        <form method="GET" action="{{ route('employees.index') }}" class="p-6">
+            <div class="flex flex-wrap gap-4">
+                <div class="flex-1 min-w-80">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">بحث بالاسم أو الرقم</label>
+                    <input type="text" name="search" value="{{ request('search') }}" 
+                           placeholder="الاسم أو الرقم الوطني"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                
+                <div class="flex-1 min-w-40">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">الدرجة الوظيفية</label>
+                    <select name="rank_id" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="">جميع الدرجات</option>
+                        @foreach($ranks as $rank)
+                            <option value="{{ $rank->id }}" {{ request('rank_id') == $rank->id ? 'selected' : '' }}>
+                                {{ $rank->rank_name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                
+                <div class="flex items-end gap-3">
+                    <button type="submit" class="px-6 py-2 bg-primary hover:bg-dark-blue-800 text-white font-medium rounded-lg transition duration-300 flex items-center whitespace-nowrap">
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        بحث
+                    </button>
+                    <a href="{{ route('employees.index') }}" class="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition duration-300 flex items-center whitespace-nowrap h-10">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div class="px-6 py-4 border-b border-gray-100">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900">قائمة الموظفين</h2>
+                    <p class="text-sm text-gray-600 mt-1">إدارة ومتابعة بيانات جميع الموظفين المسجلين</p>
+                </div>
+                <div class="text-sm text-gray-600">
+                    <span class="font-medium text-gray-900">{{ $persons->total() }}</span> موظف
+                </div>
+            </div>
+        </div>
+        
+        @if($persons->total() > 0)
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">رقم المعرف</th>
+                            <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">رقم الملف</th>
+                            <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الرقم الوطني</th>
+                            <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الاسم</th>
+                            <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الدرجة الوظيفية</th>
+                            <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">جهة العمل</th>
+                            <th class="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-100">
+                        @foreach($persons as $person)
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $person->id }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $person->file_number }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{!! request('search') ? preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<span class="bg-yellow-200 px-1 rounded">$1</span>', $person->national_id) : $person->national_id !!}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{!! request('search') ? preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<span class="bg-yellow-200 px-1 rounded">$1</span>', $person->name) : $person->name !!}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                    @if($person->rank)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                            {{ $person->rank->rank_name }}
+                                        </span>
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                    @if($person->workInfo)
+                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
+                                            {{ $person->workInfo->work_authority }}
+                                        </span>
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <div class="flex justify-center space-x-1">
+                                        <a href="{{ route('employees.edit', $person->id) }}" 
+                                           class="inline-flex items-center p-2 text-dark-blue-600 hover:text-dark-blue-900 hover:bg-dark-blue-50 rounded-lg transition-all duration-200" 
+                                           title="تعديل البيانات الشخصية">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                            </svg>
+                                        </a>
+                                        
+                                        @if($person->workInfo)
+                                            <a href="{{ route('work-info.edit', $person->workInfo->id) }}" 
+                                               class="inline-flex items-center p-2 text-purple-600 hover:text-purple-900 hover:bg-purple-50 rounded-lg transition-all duration-200" 
+                                               title="تعديل معلومات العمل">
+                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"/>
+                                                    <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z"/>
+                                                </svg>
+                                            </a>
+                                        @else
+                                            <a href="{{ route('work-info.create', $person->national_id) }}" 
+                                               class="inline-flex items-center p-2 text-orange-600 hover:text-orange-900 hover:bg-orange-50 rounded-lg transition-all duration-200" 
+                                               title="إضافة معلومات عمل">
+                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                                                </svg>
+                                            </a>
+                                        @endif
+                                        
+                                        <button onclick="openDeleteModal('{{ $person->id }}', '{{ $person->name }}')" 
+                                                class="inline-flex items-center p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-all duration-200" 
+                                                title="حذف">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            
+            @if($persons->hasPages())
+                <div class="px-6 py-4 border-t border-gray-100">
+                    {{ $persons->links() }}
+                </div>
+            @endif
+        @else
+            <div class="text-center py-16">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">لا يوجد موظفين</h3>
+                <p class="text-gray-500 mb-6">ابدأ بإضافة أول موظف في النظام</p>
+                <a href="{{ route('employees.create') }}" 
+                   class="inline-flex items-center px-4 py-2 bg-primary hover:bg-dark-blue-800 text-white font-medium rounded-lg transition duration-300">
+                    <svg class="w-4 h-4 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                    </svg>
+                    إضافة أول موظف
+                </a>
+            </div>
+        @endif
+    </div>
+
+    <!-- Delete Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center ml-4">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">تأكيد الحذف</h3>
+                        <p class="text-sm text-gray-500 mt-1">هذه العملية لا يمكن التراجع عنها</p>
+                    </div>
+                </div>
+                
+                <p class="text-gray-700 mb-6">
+                    هل أنت متأكد من حذف بيانات الموظف 
+                    <span id="personName" class="font-semibold text-gray-900"></span>؟
+                </p>
+                
+                <div class="flex justify-end gap-3">
+                    <button onclick="closeDeleteModal()" 
+                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        إلغاء
+                    </button>
+                    <button onclick="confirmDelete()" 
+                            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center">
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        حذف
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form id="deleteForm" method="POST" style="display: none;">
+        @csrf
+        @method('DELETE')
+    </form>
+
+    <script>
+        let currentPersonId = null;
+        
+        function openDeleteModal(personId, personName) {
+            currentPersonId = personId;
+            document.getElementById('personName').textContent = personName;
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.getElementById('deleteModal').classList.add('flex');
+        }
+        
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            document.getElementById('deleteModal').classList.remove('flex');
+            currentPersonId = null;
+        }
+        
+        function confirmDelete() {
+            if (currentPersonId) {
+                const form = document.getElementById('deleteForm');
+                form.action = `/employees/${currentPersonId}`;
+                form.submit();
+            }
+        }
+        
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDeleteModal();
+            }
+        });
+    </script>
+</x-layout>

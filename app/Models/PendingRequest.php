@@ -7,32 +7,48 @@ use Illuminate\Database\Eloquent\Model;
 class PendingRequest extends Model
 {
     protected $fillable = [
-        'person_id', 'old_type_id', 'new_type_id', 'old_rank_id', 'new_rank_id',
-        'old_military_no', 'new_military_no', 'status'
+        'type',
+        'record_id',
+        'original_data',
+        'new_data',
+        'status',
+        'requested_by',
+        'reviewed_by',
+        'rejection_reason'
     ];
 
-    public function person()
+    protected $casts = [
+        'original_data' => 'array',
+        'new_data' => 'array'
+    ];
+
+    public function getRecordAttribute()
     {
-        return $this->belongsTo(Person::class, 'person_id', 'system_no');
+        switch ($this->type) {
+            case 'person':
+                return Person::find($this->record_id);
+            case 'military_info':
+                return MilitaryInfo::with('person')->find($this->record_id);
+            case 'work_info':
+                return WorkInfo::with('person')->find($this->record_id);
+            default:
+                return null;
+        }
     }
 
-    public function oldType()
+    public function getPersonAttribute()
     {
-        return $this->belongsTo(Type::class, 'old_type_id');
-    }
-
-    public function newType()
-    {
-        return $this->belongsTo(Type::class, 'new_type_id');
-    }
-
-    public function oldRank()
-    {
-        return $this->belongsTo(Rank::class, 'old_rank_id');
-    }
-
-    public function newRank()
-    {
-        return $this->belongsTo(Rank::class, 'new_rank_id');
+        switch ($this->type) {
+            case 'person':
+                return Person::find($this->record_id);
+            case 'military_info':
+                $militaryInfo = MilitaryInfo::find($this->record_id);
+                return $militaryInfo ? Person::where('national_id', $militaryInfo->national_id)->first() : null;
+            case 'work_info':
+                $workInfo = WorkInfo::find($this->record_id);
+                return $workInfo ? Person::where('national_id', $workInfo->national_id)->first() : null;
+            default:
+                return null;
+        }
     }
 }

@@ -196,18 +196,23 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{!! request('search') ? preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<span class="bg-yellow-200 px-1 rounded">$1</span>', $person->national_id) : $person->national_id !!}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{!! request('search') ? preg_replace('/(' . preg_quote(request('search'), '/') . ')/i', '<span class="bg-yellow-200 px-1 rounded">$1</span>', $person->name) : $person->name !!}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                @if($person->rank->category->category_name == 'ضابط') bg-dark-blue-100 text-dark-blue-800
-                                                @elseif($person->rank->category->category_name == 'ضابط صف') bg-dark-blue-200 text-dark-blue-900
-                                                @else bg-purple-100 text-purple-800 @endif
-                                                @if(request('category_id') == $person->rank->category_id) ring-2 ring-yellow-400 @endif">
-                                                {{ $person->rank->category->category_name }}
-                                            </span>
+                                            @if($person->rank && $person->rank->category)
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                    @if($person->rank->category->category_name == 'ضابط') bg-dark-blue-100 text-dark-blue-800
+                                                    @elseif($person->rank->category->category_name == 'ضابط صف') bg-dark-blue-200 text-dark-blue-900
+                                                    @else bg-purple-100 text-purple-800 @endif">
+                                                    {{ $person->rank->category->category_name }}
+                                                </span>
+                                            @else
+                                                <span class="text-gray-400">-</span>
+                                            @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                            <span class="@if(request('rank_id') == $person->rank_id) bg-yellow-200 px-1 rounded @endif">
+                                            @if($person->rank)
                                                 {{ $person->rank->rank_name }}
-                                            </span>
+                                            @else
+                                                <span class="text-gray-400">-</span>
+                                            @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                             @if($person->militaryInfo)

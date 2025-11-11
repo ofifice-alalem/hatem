@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Person;
 use App\Models\WorkInfo;
 use App\Models\EmploymentStatus;
+use App\Models\PendingRequest;
 use Illuminate\Http\Request;
 
 class WorkInfoController extends Controller
@@ -29,7 +30,7 @@ class WorkInfoController extends Controller
 
     public function edit($id)
     {
-        $workInfo = WorkInfo::findOrFail($id);
+        $workInfo = WorkInfo::with('person')->findOrFail($id);
         $employmentStatuses = EmploymentStatus::all();
         return view('work-info.edit', compact('workInfo', 'employmentStatuses'));
     }
@@ -37,8 +38,16 @@ class WorkInfoController extends Controller
     public function update(Request $request, $id)
     {
         $workInfo = WorkInfo::findOrFail($id);
-        $workInfo->update($request->all());
+        
+        // إنشاء طلب معلق للموافقة
+        PendingRequest::create([
+            'type' => 'work_info',
+            'record_id' => $workInfo->id,
+            'original_data' => $workInfo->toArray(),
+            'new_data' => $request->all(),
+            'requested_by' => 'المستخدم الحالي'
+        ]);
 
-        return redirect()->route('persons.index')->with('success', 'تم تحديث معلومات العمل بنجاح');
+        return redirect()->route('persons.index')->with('success', 'تم إرسال طلب تعديل معلومات العمل للمراجعة');
     }
 }

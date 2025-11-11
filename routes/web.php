@@ -6,6 +6,9 @@ use App\Http\Controllers\PendingRequestController;
 use App\Http\Controllers\MilitaryInfoController;
 use App\Http\Controllers\WorkInfoController;
 use App\Http\Controllers\LeaveController;
+use App\Http\Controllers\OfficerController;
+use App\Http\Controllers\NonCommissionedOfficerController;
+use App\Http\Controllers\EmployeeController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -14,6 +17,15 @@ Route::get('/', function () {
 // الأشخاص
 Route::resource('persons', PersonController::class);
 Route::get('/api/ranks/{categoryId}', [PersonController::class, 'getRanksByCategory'])->name('ranks.by.category');
+
+// الضباط
+Route::resource('officers', OfficerController::class);
+
+// ضباط الصف
+Route::resource('non-commissioned-officers', NonCommissionedOfficerController::class);
+
+// الموظفين
+Route::resource('employees', EmployeeController::class);
 
 // المعلومات العسكرية
 Route::get('/military-info/create/{nationalId}', [MilitaryInfoController::class, 'create'])->name('military-info.create');

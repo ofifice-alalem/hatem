@@ -5,14 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\PendingRequest;
 use App\Models\Person;
 use App\Models\MilitaryInfo;
+use App\Models\WorkInfo;
 use Illuminate\Http\Request;
 
 class PendingRequestController extends Controller
 {
     public function index()
     {
-        $requests = PendingRequest::with(['person', 'oldType', 'newType', 'oldRank', 'newRank'])
-                                 ->where('status', 'pending')
+        $requests = PendingRequest::where('status', 'pending')
                                  ->orderBy('created_at', 'desc')
                                  ->get();
         return view('pending.index', compact('requests'));
@@ -20,34 +20,43 @@ class PendingRequestController extends Controller
 
     public function approve($id)
     {
-        $request = PendingRequest::findOrFail($id);
-        $person = $request->person;
+        $pendingRequest = PendingRequest::findOrFail($id);
         
-        // تحديث بيانات الشخص
-        $person->update([
-            'type_id' => $request->new_type_id,
-            'rank_id' => $request->new_rank_id
-        ]);
-        
-        // تحديث المعلومات العسكرية
-        if ($request->new_military_no) {
-            MilitaryInfo::updateOrCreate(
-                ['national_no' => $person->national_no],
-                ['military_no' => $request->new_military_no]
-            );
-        } else {
-            MilitaryInfo::where('national_no', $person->national_no)->delete();
+        switch ($pendingRequest->type) {
+            case 'person':
+                $person = Person::find($pendingRequest->record_id);
+                $person->update($pendingRequest->new_data);
+                // التزامن يتم تلقائياً عبر Model Events
+                break;
+                
+            case 'military_info':
+                $militaryInfo = MilitaryInfo::find($pendingRequest->record_id);
+                $militaryInfo->update($pendingRequest->new_data);
+                // التزامن يتم تلقائياً عبر Model Events
+                break;
+                
+            case 'work_info':
+                $workInfo = WorkInfo::find($pendingRequest->record_id);
+                $workInfo->update($pendingRequest->new_data);
+                break;
         }
         
-        $request->update(['status' => 'approved']);
+        $pendingRequest->update([
+            'status' => 'approved',
+            'reviewed_by' => 'المراجع الحالي'
+        ]);
         
         return redirect()->route('pending.index')->with('success', 'تم الموافقة على الطلب بنجاح');
     }
 
-    public function reject($id)
+    public function reject(Request $request, $id)
     {
-        $request = PendingRequest::findOrFail($id);
-        $request->update(['status' => 'rejected']);
+        $pendingRequest = PendingRequest::findOrFail($id);
+        $pendingRequest->update([
+            'status' => 'rejected',
+            'reviewed_by' => 'المراجع الحالي',
+            'rejection_reason' => $request->rejection_reason
+        ]);
         
         return redirect()->route('pending.index')->with('success', 'تم رفض الطلب');
     }

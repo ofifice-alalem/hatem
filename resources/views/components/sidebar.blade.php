@@ -36,15 +36,37 @@
                 <span>الطلبات المعلقة</span>
             </a>
 
-            <!-- Add Person -->
-            <a href="{{ route('persons.create') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ request()->routeIs('persons.create') ? 'bg-gradient-to-r from-primary/10 to-dark-blue-100 text-primary border-r-2 border-primary' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                <div class="w-5 h-5 ml-3 {{ request()->routeIs('persons.create') ? 'text-primary' : 'text-gray-400 group-hover:text-gray-600' }}">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            <!-- Officers -->
+            <a href="{{ route('officers.index') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ request()->routeIs('officers.*') ? 'bg-gradient-to-r from-primary/10 to-dark-blue-100 text-primary border-r-2 border-primary' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                <div class="w-5 h-5 ml-3 {{ request()->routeIs('officers.*') ? 'text-primary' : 'text-gray-400 group-hover:text-gray-600' }}">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
                     </svg>
                 </div>
-                <span>إضافة شخص</span>
+                <span>الضباط</span>
             </a>
+
+            <!-- Non-Commissioned Officers -->
+            <a href="{{ route('non-commissioned-officers.index') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ request()->routeIs('non-commissioned-officers.*') ? 'bg-gradient-to-r from-yellow-50 to-yellow-100 text-yellow-700 border-r-2 border-yellow-500' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                <div class="w-5 h-5 ml-3 {{ request()->routeIs('non-commissioned-officers.*') ? 'text-yellow-600' : 'text-gray-400 group-hover:text-gray-600' }}">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                </div>
+                <span>ضباط الصف</span>
+            </a>
+
+            <!-- Employees -->
+            <a href="{{ route('employees.index') }}" class="group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 {{ request()->routeIs('employees.*') ? 'bg-gradient-to-r from-purple-50 to-purple-100 text-purple-700 border-r-2 border-purple-500' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                <div class="w-5 h-5 ml-3 {{ request()->routeIs('employees.*') ? 'text-purple-600' : 'text-gray-400 group-hover:text-gray-600' }}">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
+                    </svg>
+                </div>
+                <span>الموظفين</span>
+            </a>
+
+
             
             <!-- Reports -->
             <a href="#" class="group flex items-center px-3 py-3 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
