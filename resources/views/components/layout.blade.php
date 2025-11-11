@@ -46,8 +46,19 @@
             transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
         }
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: #0f0f1e;
             min-height: 100vh;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-purple {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .gradient-blue {
+            background: linear-gradient(135deg, #667eea 0%, #4c6ef5 100%);
         }
     </style>
     <meta name="csrf-token" content="{{ csrf_token() }}">

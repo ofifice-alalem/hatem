@@ -1,5 +1,5 @@
 <!-- Sidebar -->
-<div class="fixed top-4 right-4 bottom-4 w-64 bg-white shadow-card rounded-2xl z-50 border border-gray-100">
+<div class="fixed top-4 right-4 bottom-4 w-64 glass-effect shadow-2xl rounded-2xl z-50">
     <div class="p-6">
         <!-- Logo -->
         <div class="flex items-center mb-12">
