@@ -26,12 +26,14 @@
                     </select>
                 </div>
 
+                @if($militaryInfo->person->rank && $militaryInfo->person->rank->category_id == 2)
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">الرقم العسكري</label>
                     <input type="text" name="military_number" value="{{ $militaryInfo->military_number }}" 
                            class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
                            placeholder="أدخل الرقم العسكري">
                 </div>
+                @endif
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

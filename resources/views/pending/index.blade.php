@@ -260,8 +260,30 @@
                 'passport_number': 'رقم الجواز',
                 'military_number': 'الرقم العسكري',
                 'military_rank_id': 'الرتبة',
+                'appointment_date': 'تاريخ التعيين',
+                'appointment_authority': 'جهة التعيين',
+                'appointment_decision_number': 'رقم قرار التعيين',
+                'last_promotion_date': 'تاريخ آخر ترفيع',
+                'last_promotion_decision': 'قرار آخر ترفيع',
+                'last_promotion_year': 'سنة آخر ترفيع',
+                'seniority': 'الأقدمية',
                 'work_authority': 'جهة العمل',
-                'work_location': 'مكان العمل'
+                'work_location': 'مكان العمل',
+                'office': 'المكتب',
+                'assigned_task': 'العمل المكلف به',
+                'employment_status_id': 'الحالة الوظيفية',
+                'employment_status_detail': 'تفاصيل الحالة الوظيفية',
+                'employment_notes': 'ملاحظات الوظيفة',
+                'financial_number': 'الرقم المالي',
+                'direct_date': 'تاريخ المباشرة',
+                'wife_nationality': 'جنسية الزوجة',
+                'transfer_decision_number': 'رقم قرار النقل',
+                'transfer_date': 'تاريخ النقل',
+                'transfer_authority': 'جهة النقل',
+                'academic_degree': 'الدرجة العلمية',
+                'academic_degree_date': 'تاريخ الدرجة العلمية',
+                'reviewed': 'تمت المراجعة',
+                'leadership': 'قيادي'
             };
             
             let content = `

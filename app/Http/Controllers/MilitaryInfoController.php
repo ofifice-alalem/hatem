@@ -71,18 +71,33 @@ class MilitaryInfoController extends Controller
         ]);
 
         $requestData = $request->only([
-            'military_rank_id', 'military_number', 'appointment_date', 'appointment_authority',
+            'military_rank_id', 'appointment_date', 'appointment_authority',
             'appointment_decision_number', 'last_promotion_date', 'last_promotion_decision',
             'last_promotion_year', 'seniority'
         ]);
+        
+        // إضافة military_number فقط إذا كان ضابط صف (category_id = 2)
+        if($militaryInfo->person->rank && $militaryInfo->person->rank->category_id == 2) {
+            $requestData['military_number'] = $request->military_number;
+        }
 
         // فلترة الحقول المتغيرة فقط
         $originalData = $militaryInfo->only(array_keys($requestData));
         $changedData = [];
         
+        $dateFields = ['appointment_date', 'last_promotion_date'];
+        
         foreach($requestData as $key => $value) {
-            if($originalData[$key] != $value) {
-                $changedData[$key] = $value;
+            $originalValue = $originalData[$key];
+            
+            // تطبيع التواريخ للمقارنة
+            if(in_array($key, $dateFields)) {
+                $originalValue = $originalValue ? date('Y-m-d', strtotime($originalValue)) : null;
+                $value = $value ? date('Y-m-d', strtotime($value)) : null;
+            }
+            
+            if($originalValue != $value) {
+                $changedData[$key] = $requestData[$key]; // استخدام القيمة الأصلية من الطلب
             }
         }
 

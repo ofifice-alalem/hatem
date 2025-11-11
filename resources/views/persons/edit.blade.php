@@ -61,17 +61,119 @@
                                placeholder="أدخل الاسم الكامل" required>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">الرتبة</label>
-                        <select name="rank_id" id="rank_id" 
-                                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" required>
-                            <option value="">اختر الرتبة</option>
-                            @foreach($ranks as $rank)
-                                <option value="{{ $rank->id }}" {{ old('rank_id', $person->rank_id) == $rank->id ? 'selected' : '' }}>
-                                    {{ $rank->category->category_name }} - {{ $rank->rank_name }}
-                                </option>
-                            @endforeach
-                        </select>
+                    <!-- المعلومات العسكرية -->
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">المعلومات العسكرية</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">الرتبة</label>
+                                <select name="military_rank_id" 
+                                        class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                                    <option value="">اختر الرتبة</option>
+                                    @foreach($ranks as $rank)
+                                        <option value="{{ $rank->id }}" {{ old('military_rank_id', $person->militaryInfo->military_rank_id ?? '') == $rank->id ? 'selected' : '' }}>
+                                            {{ $rank->category->category_name }} - {{ $rank->rank_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">الرقم العسكري</label>
+                                <input type="text" name="military_number" value="{{ old('military_number', $person->militaryInfo->military_number ?? '') }}" 
+                                       class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                                       placeholder="أدخل الرقم العسكري">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ التعيين</label>
+                                <input type="date" name="appointment_date" value="{{ old('appointment_date', $person->militaryInfo && $person->militaryInfo->appointment_date ? $person->militaryInfo->appointment_date->format('Y-m-d') : '') }}" 
+                                       class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">جهة التعيين</label>
+                                <input type="text" name="appointment_authority" value="{{ old('appointment_authority', $person->militaryInfo->appointment_authority ?? '') }}" 
+                                       class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                                       placeholder="أدخل جهة التعيين">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">رقم قرار التعيين</label>
+                                <input type="text" name="appointment_decision_number" value="{{ old('appointment_decision_number', $person->militaryInfo->appointment_decision_number ?? '') }}" 
+                                       class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                                       placeholder="أدخل رقم قرار التعيين">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ آخر ترفيع</label>
+                                <input type="date" name="last_promotion_date" value="{{ old('last_promotion_date', $person->militaryInfo && $person->militaryInfo->last_promotion_date ? $person->militaryInfo->last_promotion_date->format('Y-m-d') : '') }}" 
+                                       class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">قرار آخر ترفيع</label>
+                                <input type="text" name="last_promotion_decision" value="{{ old('last_promotion_decision', $person->militaryInfo->last_promotion_decision ?? '') }}" 
+                                       class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                                       placeholder="أدخل قرار آخر ترفيع">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">سنة آخر ترفيع</label>
+                                <input type="number" name="last_promotion_year" value="{{ old('last_promotion_year', $person->militaryInfo->last_promotion_year ?? '') }}" 
+                                       class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                                       placeholder="أدخل سنة آخر ترفيع">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">الأقدمية</label>
+                                <input type="text" name="seniority" value="{{ old('seniority', $person->militaryInfo->seniority ?? '') }}" 
+                                       class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                                       placeholder="أدخل الأقدمية">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- معلومات العمل -->
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">معلومات العمل</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">جهة العمل</label>
+                                <input type="text" name="work_authority" value="{{ old('work_authority', $person->workInfo->work_authority ?? '') }}" 
+                                       class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                                       placeholder="أدخل جهة العمل">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">مكان العمل</label>
+                                <input type="text" name="work_location" value="{{ old('work_location', $person->workInfo->work_location ?? '') }}" 
+                                       class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                                       placeholder="أدخل مكان العمل">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">الحالة الوظيفية</label>
+                                <select name="employment_status_id" 
+                                        class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                                    <option value="">اختر الحالة الوظيفية</option>
+                                    @foreach($employmentStatuses as $status)
+                                        <option value="{{ $status->id }}" {{ old('employment_status_id', $person->workInfo->employment_status_id ?? '') == $status->id ? 'selected' : '' }}>
+                                            {{ $status->status_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">الرقم المالي</label>
+                                <input type="text" name="financial_number" value="{{ old('financial_number', $person->workInfo->financial_number ?? '') }}" 
+                                       class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                                       placeholder="أدخل الرقم المالي">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

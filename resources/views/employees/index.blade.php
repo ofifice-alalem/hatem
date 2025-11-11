@@ -134,6 +134,24 @@
                                             </svg>
                                         </a>
                                         
+                                        @if($person->militaryInfo)
+                                            <a href="{{ route('military-info.edit', $person->militaryInfo->id) }}" 
+                                               class="inline-flex items-center p-2 text-green-600 hover:text-green-900 hover:bg-green-50 rounded-lg transition-all duration-200" 
+                                               title="تعديل المعلومات العسكرية">
+                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                                                </svg>
+                                            </a>
+                                        @else
+                                            <a href="{{ route('military-info.create', $person->national_id) }}" 
+                                               class="inline-flex items-center p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-all duration-200" 
+                                               title="إضافة معلومات عسكرية">
+                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                                                </svg>
+                                            </a>
+                                        @endif
+                                        
                                         @if($person->workInfo)
                                             <a href="{{ route('work-info.edit', $person->workInfo->id) }}" 
                                                class="inline-flex items-center p-2 text-purple-600 hover:text-purple-900 hover:bg-purple-50 rounded-lg transition-all duration-200" 

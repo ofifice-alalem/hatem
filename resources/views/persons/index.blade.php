@@ -1,6 +1,14 @@
 <x-layout title="لوحة التحكم - إدارة الأشخاص">
     <x-header title="لوحة التحكم" description="إدارة ومتابعة بيانات الأشخاص في النظام">
         <x-slot name="actions">
+            <button onclick="openDeleteAllModal()" 
+                    class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex items-center space-x-2">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2h8a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 3a1 1 0 012 0v3a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v3a1 1 0 11-2 0V8z"/>
+                </svg>
+                <span>مسح جميع المستخدمين</span>
+            </button>
             <a href="{{ route('persons.create') }}" 
                class="bg-primary hover:bg-dark-blue-800 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex items-center space-x-2">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -402,8 +410,51 @@
         </div>
     </div>
 
+    <!-- Delete All Modal -->
+    <div id="deleteAllModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center ml-4">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">تأكيد مسح جميع المستخدمين</h3>
+                        <p class="text-sm text-gray-500 mt-1">هذه العملية لا يمكن التراجع عنها</p>
+                    </div>
+                </div>
+                
+                <p class="text-gray-700 mb-6">
+                    هل أنت متأكد من حذف <strong>جميع</strong> المستخدمين وبياناتهم؟
+                </p>
+                
+                <div class="flex justify-end gap-3">
+                    <button onclick="closeDeleteAllModal()" 
+                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        إلغاء
+                    </button>
+                    <button onclick="confirmDeleteAll()" 
+                            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center">
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        مسح جميع المستخدمين
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Hidden Delete Form -->
     <form id="deleteForm" method="POST" style="display: none;">
+        @csrf
+        @method('DELETE')
+    </form>
+
+    <!-- Hidden Delete All Form -->
+    <form id="deleteAllForm" method="POST" action="{{ route('persons.delete.all') }}" style="display: none;">
         @csrf
         @method('DELETE')
     </form>
@@ -470,6 +521,29 @@
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeDeleteModal();
+                closeDeleteAllModal();
+            }
+        });
+        
+        // Delete All Functions
+        function openDeleteAllModal() {
+            document.getElementById('deleteAllModal').classList.remove('hidden');
+            document.getElementById('deleteAllModal').classList.add('flex');
+        }
+        
+        function closeDeleteAllModal() {
+            document.getElementById('deleteAllModal').classList.add('hidden');
+            document.getElementById('deleteAllModal').classList.remove('flex');
+        }
+        
+        function confirmDeleteAll() {
+            document.getElementById('deleteAllForm').submit();
+        }
+        
+        // Close delete all modal when clicking outside
+        document.getElementById('deleteAllModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteAllModal();
             }
         });
     </script>

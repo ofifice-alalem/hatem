@@ -65,6 +65,22 @@ class EmployeeController extends Controller
             'personal_card_number', 'passport_number', 'rank_id'
         ]));
 
+        // إنشاء المعلومات العسكرية
+        if ($request->filled('appointment_date') || $request->filled('appointment_authority')) {
+            MilitaryInfo::create([
+                'national_id' => $person->national_id,
+                'military_rank_id' => $request->military_rank_id ?: $request->rank_id,
+                'military_number' => $request->military_number,
+                'appointment_date' => $request->appointment_date,
+                'appointment_authority' => $request->appointment_authority,
+                'appointment_decision_number' => $request->appointment_decision_number,
+                'last_promotion_date' => $request->last_promotion_date,
+                'last_promotion_decision' => $request->last_promotion_decision,
+                'last_promotion_year' => $request->last_promotion_year,
+                'seniority' => $request->seniority
+            ]);
+        }
+
         if ($request->filled('work_authority') || $request->filled('employment_status_id')) {
             WorkInfo::create([
                 'national_id' => $person->national_id,
@@ -108,35 +124,109 @@ class EmployeeController extends Controller
             'name' => 'required|string'
         ]);
 
-        $requestData = $request->only([
+        $allChanges = [];
+        
+        // معالجة البيانات الشخصية
+        $personData = $request->only([
             'file_type', 'file_number', 'name', 'birth_date', 'birth_place',
             'gender', 'mother_name', 'mother_nationality', 'blood_type', 'national_id',
-            'personal_card_number', 'passport_number'
+            'personal_card_number', 'passport_number', 'rank_id'
         ]);
-
-        // فلترة الحقول المتغيرة فقط
-        $originalData = $employee->only(array_keys($requestData));
-        $changedData = [];
         
-        foreach($requestData as $key => $value) {
-            if($originalData[$key] != $value) {
-                $changedData[$key] = $value;
+        $originalPersonData = $employee->only(array_keys($personData));
+        $changedPersonData = [];
+        
+        foreach($personData as $key => $value) {
+            if($originalPersonData[$key] != $value) {
+                $changedPersonData[$key] = $value;
+            }
+        }
+        
+        if(!empty($changedPersonData)) {
+            PendingRequest::create([
+                'type' => 'person',
+                'record_id' => $employee->id,
+                'original_data' => $originalPersonData,
+                'new_data' => $changedPersonData,
+                'requested_by' => 'المستخدم الحالي'
+            ]);
+            $allChanges[] = 'البيانات الشخصية';
+        }
+        
+        // معالجة المعلومات العسكرية
+        if($employee->militaryInfo) {
+            $militaryData = $request->only([
+                'military_rank_id', 'appointment_date', 'appointment_authority',
+                'appointment_decision_number', 'last_promotion_date', 'last_promotion_decision',
+                'last_promotion_year', 'seniority'
+            ]);
+            
+            $originalMilitaryData = $employee->militaryInfo->only(array_keys($militaryData));
+            $changedMilitaryData = [];
+            
+            $dateFields = ['appointment_date', 'last_promotion_date'];
+            
+            foreach($militaryData as $key => $value) {
+                $originalValue = $originalMilitaryData[$key];
+                
+                if(in_array($key, $dateFields)) {
+                    $originalValue = $originalValue ? date('Y-m-d', strtotime($originalValue)) : null;
+                    $value = $value ? date('Y-m-d', strtotime($value)) : null;
+                }
+                
+                if($originalValue != $value) {
+                    $changedMilitaryData[$key] = $militaryData[$key];
+                }
+            }
+            
+            if(!empty($changedMilitaryData)) {
+                PendingRequest::create([
+                    'type' => 'military_info',
+                    'record_id' => $employee->militaryInfo->id,
+                    'original_data' => $originalMilitaryData,
+                    'new_data' => $changedMilitaryData,
+                    'requested_by' => 'المستخدم الحالي'
+                ]);
+                $allChanges[] = 'المعلومات العسكرية';
+            }
+        }
+        
+        // معالجة معلومات العمل
+        if($employee->workInfo) {
+            $workData = $request->only([
+                'work_authority', 'work_location', 'office', 'assigned_task',
+                'employment_status_id', 'employment_status_detail', 'employment_notes',
+                'financial_number', 'direct_date', 'wife_nationality',
+                'transfer_decision_number', 'transfer_date', 'transfer_authority',
+                'academic_degree', 'academic_degree_date', 'reviewed', 'leadership'
+            ]);
+            
+            $originalWorkData = $employee->workInfo->only(array_keys($workData));
+            $changedWorkData = [];
+            
+            foreach($workData as $key => $value) {
+                if($originalWorkData[$key] != $value) {
+                    $changedWorkData[$key] = $value;
+                }
+            }
+            
+            if(!empty($changedWorkData)) {
+                PendingRequest::create([
+                    'type' => 'work_info',
+                    'record_id' => $employee->workInfo->id,
+                    'original_data' => $originalWorkData,
+                    'new_data' => $changedWorkData,
+                    'requested_by' => 'المستخدم الحالي'
+                ]);
+                $allChanges[] = 'معلومات العمل';
             }
         }
 
-        if(empty($changedData)) {
+        if(empty($allChanges)) {
             return redirect()->route('employees.index')->with('info', 'لم يتم إجراء أي تغييرات');
         }
 
-        PendingRequest::create([
-            'type' => 'person',
-            'record_id' => $employee->id,
-            'original_data' => $originalData,
-            'new_data' => $changedData,
-            'requested_by' => 'المستخدم الحالي'
-        ]);
-
-        return redirect()->route('employees.index')->with('success', 'تم إرسال طلب تعديل بيانات الموظف للمراجعة');
+        return redirect()->route('employees.index')->with('success', 'تم إرسال طلب التعديل للمراجعة: ' . implode(', ', $allChanges));
     }
 
     public function destroy(Person $employee)

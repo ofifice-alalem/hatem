@@ -148,6 +148,60 @@
                 </div>
             </div>
 
+            <!-- المعلومات العسكرية -->
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">المعلومات العسكرية</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ التعيين</label>
+                        <input type="date" name="appointment_date" value="{{ old('appointment_date') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">جهة التعيين</label>
+                        <input type="text" name="appointment_authority" value="{{ old('appointment_authority') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                               placeholder="أدخل جهة التعيين">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">رقم قرار التعيين</label>
+                        <input type="text" name="appointment_decision_number" value="{{ old('appointment_decision_number') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                               placeholder="أدخل رقم قرار التعيين">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ آخر ترفيع</label>
+                        <input type="date" name="last_promotion_date" value="{{ old('last_promotion_date') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">قرار آخر ترفيع</label>
+                        <input type="text" name="last_promotion_decision" value="{{ old('last_promotion_decision') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                               placeholder="أدخل قرار آخر ترفيع">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">سنة آخر ترفيع</label>
+                        <input type="number" name="last_promotion_year" value="{{ old('last_promotion_year') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                               placeholder="أدخل سنة آخر ترفيع">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الأقدمية</label>
+                        <input type="text" name="seniority" value="{{ old('seniority') }}" 
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                               placeholder="أدخل الأقدمية">
+                    </div>
+                </div>
+            </div>
+
             <!-- معلومات العمل -->
             <div class="border-t border-gray-200 pt-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">معلومات العمل</h3>
@@ -341,6 +395,26 @@
                 const randomRank = Math.floor(Math.random() * (rankSelect.options.length - 1)) + 1;
                 rankSelect.selectedIndex = randomRank;
             }
+            
+            // المعلومات العسكرية
+            
+            const appointmentYear = new Date().getFullYear() - (2 + Math.floor(Math.random() * 8));
+            const appointmentMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+            const appointmentDay = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+            document.querySelector('input[name="appointment_date"]').value = `${appointmentYear}-${appointmentMonth}-${appointmentDay}`;
+            
+            const authorities = ['وزارة الدفاع', 'وزارة الداخلية', 'وزارة العدل', 'وزارة المالية'];
+            document.querySelector('input[name="appointment_authority"]').value = authorities[Math.floor(Math.random() * authorities.length)];
+            document.querySelector('input[name="appointment_decision_number"]').value = 'ت/' + Math.floor(Math.random() * 9000) + 1000;
+            
+            const promotionYear = appointmentYear + Math.floor(Math.random() * 3) + 1;
+            const promotionMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+            const promotionDay = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+            document.querySelector('input[name="last_promotion_date"]').value = `${promotionYear}-${promotionMonth}-${promotionDay}`;
+            
+            document.querySelector('input[name="last_promotion_decision"]').value = 'تر/' + Math.floor(Math.random() * 9000) + 1000;
+            document.querySelector('input[name="last_promotion_year"]').value = promotionYear;
+            document.querySelector('input[name="seniority"]').value = Math.floor(Math.random() * 15) + 1 + ' سنوات';
             
             const workAuthorities = ['وزارة التربية', 'وزارة الصحة', 'وزارة المالية', 'وزارة العدل', 'وزارة الداخلية'];
             document.querySelector('input[name="work_authority"]').value = workAuthorities[Math.floor(Math.random() * workAuthorities.length)];
