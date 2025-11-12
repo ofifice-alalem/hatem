@@ -2,13 +2,24 @@
 <div class="fixed top-4 right-4 bottom-4 w-64 glass-effect shadow-2xl rounded-2xl z-50 overflow-hidden flex flex-col">
     <div class="overflow-y-auto flex-1 p-6">
         <!-- Logo -->
-        <div class="flex items-center mb-12">
+        <div class="flex items-center mb-6">
             <div class="w-10 h-10 gradient-purple rounded-xl flex items-center justify-center ml-3 shadow-md">
                 <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </div>
             <span class="text-xl font-bold text-white">نظام الإدارة</span>
+        </div>
+        
+        <!-- Theme Toggle -->
+        <div class="mb-8">
+            <button onclick="toggleTheme()" id="globalThemeBtn"
+                    class="w-full flex items-center justify-center px-3 py-3 text-sm font-medium rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
+                <svg id="globalThemeIcon" class="w-5 h-5 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                </svg>
+                <span id="themeText">الوضع الفاتح</span>
+            </button>
         </div>
         
         <!-- Menu Label -->
